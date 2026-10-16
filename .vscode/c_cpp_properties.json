@@ -1,0 +1,23 @@
+{
+  "configurations": [
+    {
+      "name": "STM32G431",
+      "compilerPath": "D:\\LuFei\\software\\Qt\\Tools\\mingw810_64\\bin\\gcc.exe",
+      "intelliSenseMode": "windows-gcc-x64",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "defines": [
+        "USE_HAL_DRIVER",
+        "STM32G431xx"
+      ],
+      "includePath": [
+        "${workspaceFolder}/Core/Inc",
+        "${workspaceFolder}/Drivers/STM32G4xx_HAL_Driver/Inc",
+        "${workspaceFolder}/Drivers/STM32G4xx_HAL_Driver/Inc/Legacy",
+        "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32G4xx/Include",
+        "${workspaceFolder}/Drivers/CMSIS/Include"
+      ]
+    }
+  ],
+  "version": 4
+}

@@ -1,0 +1,57 @@
+# Keil / ARM Compiler build outputs
+MDK-ARM/**/Objects/
+MDK-ARM/**/Listings/
+MDK-ARM/**/*.axf
+MDK-ARM/**/*.hex
+MDK-ARM/**/*.bin
+MDK-ARM/**/*.map
+MDK-ARM/**/*.htm
+MDK-ARM/**/*.crf
+MDK-ARM/**/*.d
+MDK-ARM/**/*.o
+MDK-ARM/**/*.dep
+MDK-ARM/**/*.lnp
+MDK-ARM/**/*.sct
+MDK-ARM/**/*.bak
+
+# Keil user-specific workspace state
+*.uvguix.*
+*.uvguix
+*.uvoptx
+
+# Debugger logs and generated settings
+**/JLinkLog.txt
+**/JLinkSettings.ini
+
+# CMSIS components not used by this STM32G431 project
+Drivers/CMSIS/DSP/
+Drivers/CMSIS/NN/
+Drivers/CMSIS/RTOS/
+Drivers/CMSIS/RTOS2/
+Drivers/CMSIS/docs/
+
+# CMSIS startup templates; this Keil project uses MDK-ARM/startup_stm32g431xx.s
+Drivers/CMSIS/Device/ST/STM32G4xx/Source/Templates/
+
+# Other STM32G4 device headers; keep stm32g431xx.h and stm32g4xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g411xb.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g411xc.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g414xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g441xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g471xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g473xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g474xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g483xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g484xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g491xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g4a1xx.h
+Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32gbk1cb.h
+
+# Editor and operating-system files
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+Drivers/STM32G4xx_HAL_Driver/LICENSE.txt
+Drivers/CMSIS/LICENSE.txt
+Drivers/CMSIS/Device/ST/STM32G4xx/LICENSE.txt
