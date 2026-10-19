@@ -19,7 +19,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dma.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -83,10 +85,10 @@
  * 依据电机额定电压与额定频率确定。
  * 例如：额定电压 24V，额定电频率 100Hz → VF_RATIO ≈ 0.24
  * 首次调试建议从小值开始，观察电流后再加大 */
-#define VF_RATIO            0.028f
+#define VF_RATIO            0.025f
 
 /* 目标电频率（Hz）：电机实际机械转速 = freq_e / POLE_PAIRS / 60 */
-#define TARGET_FREQ_E       60.0f
+#define TARGET_FREQ_E       30.0f
 
 /* 频率斜坡速率（Hz/s）：防止直接跳频导致电流冲击 */
 #define RAMP_RATE           20.0f
@@ -102,7 +104,7 @@
 #define CURRENT_SCALE       0.016113f
 
 /* ADC 零点偏置（1.65V 对应 2048）：后续标定后替换 */
-#define IA_OFFSET_DEFAULT   1991.0f
+#define IA_OFFSET_DEFAULT   	1991.0f
 #define IC_OFFSET_DEFAULT    1971.0f
 
 /* ============================================================
@@ -122,7 +124,6 @@ volatile float v_amp   = 0.0f;  /* 当前相电压幅值 (V) */
 /* 偏置（后续标定后更新） */
 float ia_offset = IA_OFFSET_DEFAULT;
 float ic_offset = IC_OFFSET_DEFAULT;
-
 
 /* ============================================================
  * 过流保护参数（按电机额定电流调整，务必保守）
@@ -144,12 +145,38 @@ float ic_offset = IC_OFFSET_DEFAULT;
 #define FAULT_OC_IA         2       /* A 相软过流 */
 #define FAULT_OC_IB         3       /* B 相软过流 */
 #define FAULT_OC_IC         4       /* C 相软过流 */
+#define FAULT_OVP           5        /* 过压故障 */
+#define FAULT_UVP           6        /* 欠压故障 */
 
 /* 运行时故障状态（volatile 保证中断与主循环可见性） */
 volatile uint8_t  g_fault_code   = FAULT_NONE;  /* 故障码 */
 volatile uint8_t  g_fault_latch  = 0;           /* 1 = 已锁存，禁止输出 */
 volatile uint8_t  oc_debounce    = 0;           /* 软阈值消抖计数器 */
 
+/* -------- 母线电压采样与保护参数 -------- */
+/* 计算推导：3.3V / 4096 / (4.7 / (100 + 4.7)) ≈ 0.017947 */
+#define VBUS_SCALE          0.017947f 
+
+/* 保护阈值与回差（务必根据实际电源和电机额定电压调整） */
+#define OVP_THRESHOLD       30.0f    /* 过压阈值 (V) - 考虑到TVS在40V动作，设36V较安全 */
+#define OVP_RECOVER         29.0f    /* 过压恢复阈值 (V) */
+#define UVP_THRESHOLD       10.0f    /* 欠压阈值 (V) - 低于此值可能失控 */
+#define UVP_RECOVER         12.0f    /* 欠压恢复阈值 (V) */
+
+
+/* 运行时母线电压变量 */
+volatile float vbus_voltage = 24.0f; /* 上电初值假设为 24V，防止上电瞬间误报欠压 */
+
+/*---------- 定义串口数据jastFloat 协议帧 ------------*/
+// 定义一个完整的帧结构，利用结构体保证内存布局紧凑
+typedef struct {
+    float ch_data[3];  // 发送 Ia, Ib, Ic 3个通道
+    uint8_t tail[4];   // 填充固定帧尾 0x00, 0x00, 0x80, 0x7F
+} VOFA_Frame_t;
+
+VOFA_Frame_t vofa_tx_frame = {{0.0f, 0.0f, 0.0f}, {0x00, 0x00, 0x80, 0x7F}};
+
+volatile uint8_t vofa_tx_busy = 0; // DMA 发送忙标志
 
 /* USER CODE END PV */
 
@@ -193,13 +220,18 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_TIM1_Init();
   MX_ADC2_Init();
+  MX_USART1_UART_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 		// 1. ADC2 校准
 	if (HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED) != HAL_OK) {
 			Error_Handler();
 	}
+	/* --- 启动 TIM2 1kHz 中断（用于过欠压保护和速度环） --- */
+		HAL_TIM_Base_Start_IT(&htim2);
 
 	// 2. 设置 TIM1 CH4 比较值，用于触发 ADC
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, (htim1.Instance->ARR - 1)); // ARR - 1
@@ -228,6 +260,8 @@ int main(void)
 	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET); // SD4 步进时用
 		HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_SET);
 		HAL_GPIO_WritePin(LED_G_GPIO_Port,LED_G_Pin,GPIO_PIN_RESET);
+	
+	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -243,41 +277,36 @@ int main(void)
      * 故障恢复：按下 KEY1 且故障已清除时恢复运行
      * ============================================================ */
     if (g_fault_latch)
-    {
-		
-        /* 检查故障是否真的消失了：三相电流都应接近 0 */
-        uint8_t current_clear =
-            (fabsf(ia) < 0.5f) &&
-            (fabsf(ib) < 0.5f) &&
-            (fabsf(ic) < 0.5f);
+		{
+			/* 检查电流是否归零 */
+			uint8_t current_clear = (fabsf(ia) < 0.5f) && (fabsf(ib) < 0.5f) && (fabsf(ic) < 0.5f);
+			
+			/* 检查电压是否回到安全范围（带回差，防止在临界点反复跳变） */
+			uint8_t voltage_safe = (vbus_voltage < OVP_RECOVER) && (vbus_voltage > UVP_RECOVER);
 
-        /* KEY1 按下（低电平有效） */
-      static  uint8_t key_pressed =0; key_pressed =(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9) == GPIO_PIN_RESET);
+		 	uint8_t key_pressed = (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9) == GPIO_PIN_RESET);
 
-        if (current_clear && key_pressed)
-        {
-            /* 复位所有故障状态 */
-            g_fault_code  = FAULT_NONE;
-            g_fault_latch = 0;
-            oc_debounce   = 0;
-            theta_e       = 0.0f;
-            freq_e        = 0.0f;
-            v_amp         = 0.0f;
+			if (current_clear && voltage_safe && key_pressed)
+				{
+						g_fault_code  = FAULT_NONE;
+						g_fault_latch = 0;
+						oc_debounce   = 0;
+						theta_e       = 0.0f;
+						freq_e        = 0.0f;
+						v_amp         = 0.0f;
 
-            /* 重新使能 EG2104 */
-            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+						/* 重新使能 EG2104 */
+						HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+						HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
+						HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
 
-            /* 红灯灭、绿灯亮表示恢复正常 */
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
-
-            /* 消抖延时，防止按键抖动重复触发 */
-            HAL_Delay(200);
-        }
-	
-  }
+						/* 恢复绿灯 */
+						HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
+						HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
+						
+						HAL_Delay(200); /* 按键消抖 */
+				}
+		}	
 	}
   /* USER CODE END 3 */
 }
@@ -328,7 +357,84 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-/* USER CODE BEGIN 4 */
+/**
+  * @brief 定时器周期回调（1kHz）
+  * @note  在此处理母线电压读取、过欠压保护及速度环
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM2)
+    {
+        /* ========================================================
+         * 第 1 步：软件触发 ADC2 规则组并读取母线电压
+         * ======================================================== */
+        uint16_t raw_vbus = 0;
+        
+        /* 手动开启规则组转换 */
+       HAL_ADC_Start(&hadc2);
+			
+			// 串口发送ia ib ic 数据 1Khz
+			// 检查 DMA 是否空闲，避免覆盖正在发送的缓冲区
+			if (vofa_tx_busy == 0) {
+					vofa_tx_busy = 1;
+					// 填充数据通道
+					vofa_tx_frame.ch_data[0] = ia;
+					vofa_tx_frame.ch_data[1] = ib;
+					vofa_tx_frame.ch_data[2] = ic;
+					// 启动 DMA 发送，一帧长度为 sizeof(VOFA_Frame_t) = 16 字节
+					if (HAL_UART_Transmit_DMA(&huart1, (uint8_t *)&vofa_tx_frame, sizeof(VOFA_Frame_t)) != HAL_OK) {
+							vofa_tx_busy = 0; // 发送失败，释放忙标志
+					}
+				}
+        /* 等待转换完成（1kHz周期下有充足时间，超时设置 1ms 足够） */
+
+       raw_vbus = HAL_ADC_GetValue(&hadc2);
+        
+        /* 计算实际电压并做一阶低通滤波 */
+        float vbus_raw = (float)raw_vbus * VBUS_SCALE;
+        vbus_voltage = vbus_voltage * 0.9f + vbus_raw * 0.1f;
+
+        /* ========================================================
+         * 第 2 步：过欠压保护逻辑（仅在未锁存故障时检测）
+         * ======================================================== */
+        if (g_fault_latch == 0)
+        {
+            /* 2.1 过压检测 */
+            if (vbus_voltage > OVP_THRESHOLD)
+            {
+                FOC_EMERGENCY_STOP();
+                g_fault_code  = FAULT_OVP;
+                g_fault_latch = 1;
+                
+                /* 红灯亮，蓝绿灭 */
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
+            }
+            /* 2.2 欠压检测 */
+            else if (vbus_voltage < UVP_THRESHOLD)
+            {
+                FOC_EMERGENCY_STOP();
+                g_fault_code  = FAULT_UVP;
+                g_fault_latch = 1;
+                
+                /* 红灯亮，蓝绿灭 */
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
+            }
+        }
+			
+		
+			}
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART1) {
+        vofa_tx_busy = 0; // DMA 发送完成，允许下一帧数据覆盖缓冲区
+    }
+}
 
 /* ============================================================
  * 故障锁存与指示（内联在中断中，无函数调用）
@@ -337,19 +443,10 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
     if (hadc->Instance != ADC2) return;
 
-    /* -------- 第 0 步：故障锁存检查 --------
-     * 若已锁存故障，不再执行任何输出，仅重新武装 ADC 并返回。
-     * 必须手动把 g_fault_latch = 0 才能恢复输出。 */
-    if (g_fault_latch)
-    {
-        HAL_ADCEx_InjectedStart_IT(hadc);
-        return;
-    }
-
     /* -------- 第 1 步：读取 ADC 原始值 -------- */
     uint16_t raw_rank1 = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_1);  /* PA6 */
     uint16_t raw_rank2 = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_2);  /* PA4 */
-
+		
     /* -------- 第 2 步：换算为物理电流 -------- */
     ia = ((float)raw_rank1 - ia_offset) * CURRENT_SCALE;
     ic = ((float)raw_rank2 - ic_offset) * CURRENT_SCALE;
@@ -358,7 +455,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     /* ============================================================
      * 第 3 步：过流检测（关键保护逻辑）
      * ============================================================ */
-
+	
     /* 3.1 求三相电流绝对值，取最大值用于统一判断 */
     float fabs_ia = fabsf(ia);
     float fabs_ib = fabsf(ib);
@@ -409,7 +506,14 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
         /* 未超限：消抖计数器缓慢归零，避免计数器残留导致误报 */
         if (oc_debounce > 0) oc_debounce--;
     }
-
+			/* -------- 第 0 步：故障锁存检查 --------
+     * 若已锁存故障，不再执行任何输出，仅重新武装 ADC 并返回。
+     * 必须手动把 g_fault_latch = 0 才能恢复输出。 */
+		if (g_fault_latch)
+    {
+        HAL_ADCEx_InjectedStart_IT(hadc);
+        return;
+    }
     /* ============================================================
      * 第 4 步：过流保护通过，执行正常 V/F 控制
      * ============================================================ */
@@ -446,12 +550,16 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     vc += v_common;
 
     /* 4.6 转占空比并限幅 */
-   static float duty_a = 0;
-   static float duty_b = 0;
-   static float duty_c = 0;
-		duty_a = 0.5f + va / VBUS_NOMINAL;
-		duty_b = 0.5f + vb / VBUS_NOMINAL;
-    duty_c = 0.5f + vc / VBUS_NOMINAL;
+    float duty_a = 0;
+    float duty_b = 0;
+    float duty_c = 0;
+	 /* 在中断回调内定义一个安全的母线电压变量 */
+		float vbus_safe = vbus_voltage;
+		if (vbus_safe < 10.0f) vbus_safe = 10.0f; /* 防止除零或过小溢出 */
+		duty_a = 0.5f + va / vbus_safe;
+		duty_b = 0.5f + vb / vbus_safe;
+    duty_c = 0.5f + vc / vbus_safe;
+		
     if (duty_a < 0.0f) duty_a = 0.0f; else if (duty_a > 1.0f) duty_a = 1.0f;
     if (duty_b < 0.0f) duty_b = 0.0f; else if (duty_b > 1.0f) duty_b = 1.0f;
     if (duty_c < 0.0f) duty_c = 0.0f; else if (duty_c > 1.0f) duty_c = 1.0f;
@@ -463,6 +571,11 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 
     /* 4.8 重新武装 ADC2 */
     HAL_ADCEx_InjectedStart_IT(hadc);
+		
+		
+			
+		
+		
 }
 
 /* USER CODE END 4 */

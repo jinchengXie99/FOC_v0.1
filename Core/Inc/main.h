@@ -63,6 +63,18 @@ void Error_Handler(void);
 #define LED_G_GPIO_Port GPIOC
 #define LED_R_Pin GPIO_PIN_15
 #define LED_R_GPIO_Port GPIOC
+#define SD4_Pin GPIO_PIN_0
+#define SD4_GPIO_Port GPIOA
+#define SD2_Pin GPIO_PIN_1
+#define SD2_GPIO_Port GPIOA
+#define SD3_Pin GPIO_PIN_2
+#define SD3_GPIO_Port GPIOA
+#define SD1_Pin GPIO_PIN_0
+#define SD1_GPIO_Port GPIOB
+#define KEY2_Pin GPIO_PIN_12
+#define KEY2_GPIO_Port GPIOB
+#define KEY1_Pin GPIO_PIN_9
+#define KEY1_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
