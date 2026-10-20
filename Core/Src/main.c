@@ -69,7 +69,30 @@
 
 /* USER CODE BEGIN PV */
 
+/* ============================================================
+ * I/F 开环控制参数（频率开环，电流闭环）
+ * ============================================================ */
 
+/* 目标电频率（Hz）：决定了强制旋转磁场的速度 */
+#define TARGET_FREQ_E       60.0f
+
+/* 频率斜坡速率（Hz/s）：防止加速过快导致失步 */
+#define RAMP_RATE           15.0f
+
+/* 目标力矩电流 Iq (A)：决定了电机出力大小。
+ * 调试时从 1A~2A 开始，带载能力不足再往上加，注意不要超电机额定电流 */
+#define IF_IQ_REF           1.5f
+
+/* 目标励磁电流 Id (A)：一般设为 0 */
+#define IF_ID_REF           0.0f
+
+/* 电流环 PI 参数（初始推荐值，实际需根据电机 Ls、Rs 微调）
+ * 这里的单位是 伏特 / 安培 */
+#define PI_KP               1.0f
+#define PI_KI               0.001f
+
+/* 电压限幅：防止积分饱和和过调制 ( Vbus / √3 ) */
+#define V_OUT_MAX           12.0f 
 /* ============================================================
  * V/F 开环控制参数（按需调整）
  * ============================================================ */
@@ -85,13 +108,13 @@
  * 依据电机额定电压与额定频率确定。
  * 例如：额定电压 24V，额定电频率 100Hz → VF_RATIO ≈ 0.24
  * 首次调试建议从小值开始，观察电流后再加大 */
-#define VF_RATIO            0.025f
+#define VF_RATIO            0.5f
 
 /* 目标电频率（Hz）：电机实际机械转速 = freq_e / POLE_PAIRS / 60 */
-#define TARGET_FREQ_E       30.0f
+//#define TARGET_FREQ_E       30.0f
 
 /* 频率斜坡速率（Hz/s）：防止直接跳频导致电流冲击 */
-#define RAMP_RATE           20.0f
+//#define RAMP_RATE           20.0f
 
 /* 母线电压（V）：若启用 ADC 母线采样，可在运行时动态刷新 */
 #define VBUS_NOMINAL        24.0f
@@ -115,10 +138,21 @@
 volatile float ia = 0.0f;       /* A 相电流 (A) */
 volatile float ib = 0.0f;       /* B 相电流 (A) */
 volatile float ic = 0.0f;       /* C 相电流 (A) */
+/* 坐标变换中间变量 (方便 VOFA+ 观察) */
+volatile float i_alpha = 0.0f, i_beta = 0.0f;
+volatile float i_d = 0.0f, i_q = 0.0f;
+volatile float v_d = 0.0f, v_q = 0.0f;
+volatile float v_alpha = 0.0f, v_beta = 0.0f;
+/* I/F 状态 */
+volatile float theta_e = 0.0f;  /* 强制电角度 */
+volatile float freq_e  = 0.0f;  /* 当前电频率 */
 
+/* PI 积分累加项 */
+static float integral_d = 0.0f;
+static float integral_q = 0.0f;
 /* V/F 状态 */
-volatile float theta_e = 0.0f;  /* 当前电角度 (rad)，0~2π */
-volatile float freq_e  = 0.0f;  /* 当前电频率 (Hz) */
+//volatile float theta_e = 0.0f;  /* 当前电角度 (rad)，0~2π */
+//volatile float freq_e  = 0.0f;  /* 当前电频率 (Hz) */
 volatile float v_amp   = 0.0f;  /* 当前相电压幅值 (V) */
 
 /* 偏置（后续标定后更新） */
@@ -170,7 +204,7 @@ volatile float vbus_voltage = 24.0f; /* 上电初值假设为 24V，防止上电
 /*---------- 定义串口数据jastFloat 协议帧 ------------*/
 // 定义一个完整的帧结构，利用结构体保证内存布局紧凑
 typedef struct {
-    float ch_data[3];  // 发送 Ia, Ib, Ic 3个通道
+    float ch_data[5];  // 发送 Ia, Ib, Ic 3个通道
     uint8_t tail[4];   // 填充固定帧尾 0x00, 0x00, 0x80, 0x7F
 } VOFA_Frame_t;
 
@@ -381,6 +415,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 					vofa_tx_frame.ch_data[0] = ia;
 					vofa_tx_frame.ch_data[1] = ib;
 					vofa_tx_frame.ch_data[2] = ic;
+					vofa_tx_frame.ch_data[3] = i_q;
+					vofa_tx_frame.ch_data[4] = i_d;
+			
 					// 启动 DMA 发送，一帧长度为 sizeof(VOFA_Frame_t) = 16 字节
 					if (HAL_UART_Transmit_DMA(&huart1, (uint8_t *)&vofa_tx_frame, sizeof(VOFA_Frame_t)) != HAL_OK) {
 							vofa_tx_busy = 0; // 发送失败，释放忙标志
@@ -408,7 +445,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
                 
                 /* 红灯亮，蓝绿灭 */
                 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
-                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
                 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
             }
             /* 2.2 欠压检测 */
@@ -420,7 +456,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
                 
                 /* 红灯亮，蓝绿灭 */
                 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
-                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
                 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
             }
         }
@@ -442,7 +477,17 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
     if (hadc->Instance != ADC2) return;
-
+		
+		HAL_GPIO_WritePin(LED_B_GPIO_Port,LED_B_Pin,GPIO_PIN_SET); // 用于测量运行时间
+	
+		/* -------- 第 0 步：故障锁存检查 --------
+     * 若已锁存故障，不再执行任何输出，仅重新武装 ADC 并返回。
+     * 必须手动把 g_fault_latch = 0 才能恢复输出。 */
+		if (g_fault_latch)
+    {
+        HAL_ADCEx_InjectedStart_IT(hadc);
+        return;
+    }
     /* -------- 第 1 步：读取 ADC 原始值 -------- */
     uint16_t raw_rank1 = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_1);  /* PA6 */
     uint16_t raw_rank2 = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_2);  /* PA4 */
@@ -473,7 +518,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 
         /* 红灯常亮告警（假设低电平点亮，若极性相反请改为 SET） */
         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);   /* 蓝灭 */
+       
         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);   /* 绿灭 */
 
         HAL_ADCEx_InjectedStart_IT(hadc);
@@ -494,7 +539,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
             g_fault_latch = 1;
 
             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);  /* 红亮 */
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+       
             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
 
             HAL_ADCEx_InjectedStart_IT(hadc);
@@ -506,76 +551,104 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
         /* 未超限：消抖计数器缓慢归零，避免计数器残留导致误报 */
         if (oc_debounce > 0) oc_debounce--;
     }
-			/* -------- 第 0 步：故障锁存检查 --------
-     * 若已锁存故障，不再执行任何输出，仅重新武装 ADC 并返回。
-     * 必须手动把 g_fault_latch = 0 才能恢复输出。 */
-		if (g_fault_latch)
-    {
-        HAL_ADCEx_InjectedStart_IT(hadc);
-        return;
-    }
-    /* ============================================================
-     * 第 4 步：过流保护通过，执行正常 V/F 控制
+	
+     /* ============================================================
+     * 第 4 步：执行 I/F 控制（电流闭环，角度开环）
      * ============================================================ */
 
-    /* 4.1 频率斜坡 */
+    /* 4.1 频率斜坡与强制角度更新 */
     if (freq_e < TARGET_FREQ_E)
     {
         freq_e += RAMP_RATE * FOC_DT;
         if (freq_e > TARGET_FREQ_E) freq_e = TARGET_FREQ_E;
     }
-
-    /* 4.2 幅值计算与限幅 */
-    v_amp = freq_e * VF_RATIO;
-    if (v_amp > V_PHASE_MAX) v_amp = V_PHASE_MAX;
-
-    /* 4.3 角度更新与归一化 */
+    
+    /* 更新强制电角度 (弧度) */
     theta_e += 6.28318531f * freq_e * FOC_DT;
     if (theta_e >= 6.28318531f) theta_e -= 6.28318531f;
 
-    /* 4.4 三相正弦 */
-    float va = v_amp * sinf(theta_e);
-    float vb = v_amp * sinf(theta_e - 2.09439510f);
-    float vc = v_amp * sinf(theta_e + 2.09439510f);
+    /* 预计算三角函数 (反 Park 和 Park 变换都要用) */
+    float sin_e = sinf(theta_e);
+    float cos_e = cosf(theta_e);
 
-    /* 4.5 零序注入（等效 SVPWM） */
-    float v_max = va, v_min = va;
-    if (vb > v_max) v_max = vb;
-    if (vc > v_max) v_max = vc;
-    if (vb < v_min) v_min = vb;
-    if (vc < v_min) v_min = vc;
+    /* 4.2 Clarke 变换 (等幅值变换)：Ia, Ib, Ic -> I_alpha, I_beta */
+    /* 假设 ia + ib + ic = 0 */
+    i_alpha = ia;
+    i_beta  = (ia + 2.0f * ib) * 0.57735027f;  /* 1/√3 = 0.57735 */
+
+    /* 4.3 Park 变换：I_alpha, I_beta -> I_d, I_q */
+    i_d =  i_alpha * cos_e + i_beta * sin_e;
+    i_q = -i_alpha * sin_e + i_beta * cos_e;
+
+    /* 4.4 电流环 PI 控制器 */
+    float err_d = IF_ID_REF - i_d;
+    float err_q = IF_IQ_REF - i_q;
+
+    /* 积分项累加 (带抗饱和) */
+    integral_d += PI_KI * err_d;
+    integral_q += PI_KI * err_q;
+
+    /* 积分限幅：防止 PI 输出无限大 */
+    if (integral_d > V_OUT_MAX)  integral_d = V_OUT_MAX;
+    if (integral_d < -V_OUT_MAX) integral_d = -V_OUT_MAX;
+    if (integral_q > V_OUT_MAX)  integral_q = V_OUT_MAX;
+    if (integral_q < -V_OUT_MAX) integral_q = -V_OUT_MAX;
+
+    /* 计算输出电压 V_d, V_q */
+    v_d = PI_KP * err_d + integral_d;
+    v_q = PI_KP * err_q + integral_q;
+
+    /* 输出限幅 */
+    if (v_d > V_OUT_MAX)  v_d = V_OUT_MAX;
+    if (v_d < -V_OUT_MAX) v_d = -V_OUT_MAX;
+    if (v_q > V_OUT_MAX)  v_q = V_OUT_MAX;
+    if (v_q < -V_OUT_MAX) v_q = -V_OUT_MAX;
+
+    /* 4.5 反 Park 变换：V_d, V_q -> V_alpha, V_beta */
+    v_alpha = v_d * cos_e - v_q * sin_e;
+    v_beta  = v_d * sin_e + v_q * cos_e;
+
+    /* 4.6 反 Clarke 变换（为了 SVPWM 注入零序） */
+    /* V_a, V_b, V_c 表示三相相电压参考值 */
+    float va_ref = v_alpha;
+    float vb_ref = -0.5f * v_alpha + 0.86602540f * v_beta; /* √3/2 = 0.866 */
+    float vc_ref = -0.5f * v_alpha - 0.86602540f * v_beta;
+
+    /* 4.7 SVPWM 零序注入 (等效 SVPWM 算法，母线利用率最高) */
+    float v_max = va_ref, v_min = va_ref;
+    if (vb_ref > v_max) v_max = vb_ref;
+    if (vc_ref > v_max) v_max = vc_ref;
+    if (vb_ref < v_min) v_min = vb_ref;
+    if (vc_ref < v_min) v_min = vc_ref;
+    
     float v_common = -(v_max + v_min) * 0.5f;
-    va += v_common;
-    vb += v_common;
-    vc += v_common;
+    va_ref += v_common;
+    vb_ref += v_common;
+    vc_ref += v_common;
 
-    /* 4.6 转占空比并限幅 */
-    float duty_a = 0;
-    float duty_b = 0;
-    float duty_c = 0;
-	 /* 在中断回调内定义一个安全的母线电压变量 */
-		float vbus_safe = vbus_voltage;
-		if (vbus_safe < 10.0f) vbus_safe = 10.0f; /* 防止除零或过小溢出 */
-		duty_a = 0.5f + va / vbus_safe;
-		duty_b = 0.5f + vb / vbus_safe;
-    duty_c = 0.5f + vc / vbus_safe;
-		
+    /* 4.8 转占空比并写入 CCR */
+    float vbus_safe = vbus_voltage;
+    if (vbus_safe < 10.0f) vbus_safe = 10.0f; 
+
+    float duty_a = 0.5f + va_ref / vbus_safe;
+    float duty_b = 0.5f + vb_ref / vbus_safe;
+    float duty_c = 0.5f + vc_ref / vbus_safe;
+
+    /* 占空比限幅 */
     if (duty_a < 0.0f) duty_a = 0.0f; else if (duty_a > 1.0f) duty_a = 1.0f;
     if (duty_b < 0.0f) duty_b = 0.0f; else if (duty_b > 1.0f) duty_b = 1.0f;
     if (duty_c < 0.0f) duty_c = 0.0f; else if (duty_c > 1.0f) duty_c = 1.0f;
 
-    /* 4.7 写入 CCR */
-     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, (uint32_t)(duty_a * (float)htim1.Instance->ARR));
-     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (uint32_t)(duty_b * (float)htim1.Instance->ARR));
-     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, (uint32_t)(duty_c * (float)htim1.Instance->ARR));
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, (uint32_t)(duty_a * (float)htim1.Instance->ARR));
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (uint32_t)(duty_b * (float)htim1.Instance->ARR));
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, (uint32_t)(duty_c * (float)htim1.Instance->ARR));
 
-    /* 4.8 重新武装 ADC2 */
+    /* 4.9 重新武装 ADC2 */
     HAL_ADCEx_InjectedStart_IT(hadc);
-		
 		
 			
 		
-		
+		HAL_GPIO_WritePin(LED_B_GPIO_Port,LED_B_Pin,GPIO_PIN_RESET);
 }
 
 /* USER CODE END 4 */
