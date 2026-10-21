@@ -61,9 +61,9 @@
 #define IF_START_IQ         0.8f        /* I/F 启动电流 (A) */
 
 /* --- 4. 速度环 PI 参数 --- */
-#define SPD_KP              1.0f       
-#define SPD_KI              0.1f      
-#define SPD_TARGET_RPM      3300.0f      
+#define SPD_KP              0.01f       
+#define SPD_KI              0.0001f      
+#define SPD_TARGET_RPM      1000.0f      
 
 /* --- 5. 电流环 PI 参数 --- */
 #define PI_KP               1.0f        
@@ -90,7 +90,7 @@ volatile float theta_e = 0.0f;
 volatile float omega_e_est = 0.0f;      
 volatile float speed_rpm_est = 0.0f;    
 volatile float angle_offset = 0.0f;     
-
+float spd_target_rpm = SPD_TARGET_RPM;
 /* PLL 状态 */
 static float pll_integral = 0.0f;
 static float e_alpha_lpf = 0.0f;
@@ -281,20 +281,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             run_timer++;
             
             /* 纯电流闭环时间：加长到 2 秒，让 PLL 死死咬住转子 */
-            if (run_timer < 2000) 
+            if (run_timer < 1000) 
             {
                 iq_ref = IF_START_IQ; 
                 integral_spd = IF_START_IQ; 
             }
             else
             {
-                float err_spd = SPD_TARGET_RPM - speed_rpm_est;
+                float err_spd = spd_target_rpm - speed_rpm_est;
                 
                 /* 1. 拦截各种异常数值 */
                 if (isnan(err_spd) || isinf(err_spd)) err_spd = 0.0f;
                 
                 /* 2. 加入速度死区：如果误差在 ±20 RPM 以内，不调节（防抖动） */
-                if (err_spd > -20.0f && err_spd < 20.0f) err_spd = 0.0f;
+                if (err_spd > -10.0f && err_spd < 10.0f) err_spd = 0.0f;
                 
                 /* 3. 严苛的比例限幅 */
                 if (err_spd > 100.0f)  err_spd = 100.0f;  
@@ -302,20 +302,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
                 
                 /* 4. 积分累加与抗饱和（积分限幅卡死） */
                 integral_spd += SPD_KI * err_spd;
-                if (integral_spd > 2.0f)  integral_spd = 2.0f; 
-                if (integral_spd < -2.0f) integral_spd = -2.0f;
+                if (integral_spd > 4.0f)  integral_spd = 4.0f; 
+                if (integral_spd < -4.0f) integral_spd = -4.0f;
                 
                 /* 5. 计算目标电流（限制在 5A 以内） */
                 float iq_target = SPD_KP * err_spd + integral_spd;
-                if (iq_target > 5.0f)  iq_target = 5.0f;
+                if (iq_target > 7.0f)  iq_target = 7.0f;
                 if (iq_target < -5.0f) iq_target = -5.0f;
                 
                 /* 6. 极度平缓的电流斜坡（每秒最多变 1A），彻底杜绝急刹车 */
                 if (iq_target > iq_ref) {
-                    iq_ref += 0.001f; 
+                    iq_ref += 0.01f; 
                     if (iq_ref > iq_target) iq_ref = iq_target;
                 } else if (iq_target < iq_ref) {
-                    iq_ref -= 0.001f;
+                    iq_ref -= 0.01f;
                     if (iq_ref < iq_target) iq_ref = iq_target;
                 }
             }
@@ -329,7 +329,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         
         /* 绝对防线 */
         if (isnan(iq_ref) || isinf(iq_ref)) iq_ref = 1.0f;
-        if (iq_ref > 5.0f)  iq_ref = 5.0f;
+        if (iq_ref > 7.0f)  iq_ref = 7.0f;
         if (iq_ref < -5.0f) iq_ref = -5.0f;
 
         uint16_t raw_vbus = 0;
@@ -356,12 +356,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             vofa_tx_busy = 1;
             uart_tx_timeout = 0; 
             
-            vofa_tx_frame.ch_data[0] = SPD_TARGET_RPM;
+            vofa_tx_frame.ch_data[0] = spd_target_rpm;
             vofa_tx_frame.ch_data[1] = speed_rpm_est;
             vofa_tx_frame.ch_data[2] = iq_ref;
             vofa_tx_frame.ch_data[3] = i_q;
-            vofa_tx_frame.ch_data[4] = theta_est;
-            vofa_tx_frame.ch_data[5] = theta_if;
+            vofa_tx_frame.ch_data[4] = ia;
+            vofa_tx_frame.ch_data[5] = ib;
             
             if (HAL_UART_Transmit_DMA(&huart1, (uint8_t *)&vofa_tx_frame, sizeof(VOFA_Frame_t)) != HAL_OK) {
                 vofa_tx_busy = 0; 
@@ -492,8 +492,8 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
         float e_d = e_alpha_lpf * cos_e + e_beta_lpf * sin_e;
         
         // 防爆限幅
-        if (e_d > 5.0f) e_d = 5.0f;
-        if (e_d < -5.0f) e_d = -5.0f;
+        if (e_d > 8.0f) e_d = 8.0f;
+        if (e_d < -8.0f) e_d = -8.0f;
 
         // 【核心修复】负反馈！把加号改为减号
         pll_integral -= e_d * PLL_KI * 0.00005f;

@@ -55,3 +55,6 @@ desktop.ini
 Drivers/STM32G4xx_HAL_Driver/LICENSE.txt
 Drivers/CMSIS/LICENSE.txt
 Drivers/CMSIS/Device/ST/STM32G4xx/LICENSE.txt
+MDK-ARM/DebugConfig/FOC_v0.1_STM32G431RBTx.dbgconf
+MDK-ARM/startup_stm32g431xx.lst
+
