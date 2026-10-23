@@ -4,16 +4,6 @@
   * @file           : main.c
   * @brief          : Main program body
   ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -31,7 +21,6 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -56,7 +45,6 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -66,9 +54,26 @@
 /* ============================================================
  * 1. 电机物理参数
  * ============================================================ */
-#define MOTOR_RS            0.3298f/2.0f        /* 定子相电阻 (Ω) */
+#define MOTOR_RS            0.3644f/2.0f        /* 定子相电阻 (Ω) */
 #define MOTOR_LS            0.0000829f/2.0f     /* 定子相电感 (H) */
 #define MOTOR_POLE_PAIRS    7.0f                /* 极对数 */
+
+/* --- 反电动势实测数据 --- */
+#define MOTOR_VPP_LINE      11.98f              /* 线反电动势峰峰值 (V) */
+#define MOTOR_F_E           203.73f             /* 反电动势测试频率 (Hz) */
+
+/* --- 磁链计算常数 --- */
+/* 推导过程： 1 / (4 * sqrt(3) * pi) 
+ * 4 * 1.7320508 * 3.14159265 = 21.765592
+ * 1 / 21.765592 ≈ 0.04594407 */
+#define FLUX_CALC_CONST     (0.04594407f)
+
+/* --- 永磁体磁链计算宏 --- */
+/* 公式：Ψ_f = Vpp_line / (4 * sqrt(3) * pi * f_e) */
+#define CALC_PM_FLUX(Vpp, f_e)  (((float)(Vpp) * FLUX_CALC_CONST) / ((float)(f_e) > 0.1f ? (float)(f_e) : 0.1f))
+
+/* 最终参与 FOC 运算的磁链值 (Wb) */
+#define MOTOR_FLUX_LINKAGE  CALC_PM_FLUX(MOTOR_VPP_LINE, MOTOR_F_E) 
 
 /* ============================================================
  * 2. 系统控制参数
@@ -77,23 +82,29 @@
 #define FOC_DT              (1.0f / FOC_FREQ)   /* 控制周期 50us */
 
 /* --- 启动与切入参数 --- */
-#define IF_START_FREQ       15.0f               /* I/F 强拖目标频率 (Hz) => 600 RPM */
+#define IF_START_FREQ       30.0f               /* I/F 强拖目标频率 (Hz) */
 #define IF_RAMP_RATE        15.0f               /* I/F 加速斜坡 (Hz/s) */
 #define IF_START_IQ         0.8f                /* I/F 启动给定电流 (A) */
 
+/* --- VESC 非线性磁链观测器参数 --- */
+#define OBSERVER_GAIN       1200.0f              /* 观测器增益，典型 500~2000 */
+
+/* --- VESC 电流环参数 (带宽法) --- */
+#define CURRENT_BANDWIDTH   3000.0f             /* 电流环带宽 (rad/s) */
+#define USE_DECOUPLING      1                   /* 1: 启用交叉耦合解耦, 0: 禁用 */
+
+/* VESC 核心公式：根据带宽自动计算 PI 增益 (V/A) */
+#define CURRENT_KP  (MOTOR_LS * CURRENT_BANDWIDTH)
+#define CURRENT_KI  (MOTOR_RS * CURRENT_BANDWIDTH)
+
 /* --- 速度环 PI 参数 --- */
-#define SPD_KP              0.01f       
-#define SPD_KI              0.0001f      
+#define SPD_KP              0.001f       
+#define SPD_KI              0.00001f      
 #define SPD_TARGET_RPM      1000.0f             /* 目标机械转速 (RPM) */
 
-/* --- 电流环 PI 参数 --- */
-#define PI_KP               1.0f        
-#define PI_KI               0.01f       
-#define V_OUT_MAX           12.0f               /* 电流环输出电压限幅 (V) */
-
-/* --- PLL 观测器参数 --- */
-#define PLL_KP              30.0f               /* 锁相环比例增益 */
-#define PLL_KI              1500.0f             /* 锁相环积分增益 */
+/* --- PLL 锁相环参数 (用于从磁链提取角度) --- */
+#define PLL_KP              50.0f               
+#define PLL_KI              3000.0f             
 
 /* ============================================================
  * 3. 运行时状态变量
@@ -109,22 +120,19 @@ volatile float v_alpha_ref = 0.0f, v_beta_ref = 0.0f;
 
 /* 角度与速度变量 */
 volatile float theta_e = 0.0f;                  /* 当前输出电角度 */
-volatile float theta_est = 0.0f;                /* PLL观测角度 */
+volatile float theta_est = 0.0f;                /* 观测角度 */
 volatile float theta_if = 0.0f;                 /* I/F强制角度 */
 volatile float omega_e_est = 0.0f;              /* 估算电角速度 */
 volatile float speed_rpm_est = 0.0f;            /* 估算机械转速 */
 volatile float freq_e = 0.0f;                   /* I/F当前频率 */
-volatile float angle_offset = 0.0f;             
 
 float spd_target_rpm = SPD_TARGET_RPM;
 volatile uint16_t run_timer = 0;                /* 切入闭环后的计时器 */
 
-/* PLL 观测器内部状态 */
-static float pll_integral = 0.0f;
-static float e_alpha_lpf = 0.0f;
-static float e_beta_lpf  = 0.0f;
-static float i_alpha_last = 0.0f;
-static float i_beta_last  = 0.0f;
+/* VESC 观测器内部磁链状态 */
+static float obs_x1 = 0.0f;           
+static float obs_x2 = 0.0f;           
+static float pll_integral = 0.0f;      /* PLL 积分器 */
 
 /* 控制器积分器状态 */
 static float integral_spd = 0.0f;
@@ -188,12 +196,10 @@ volatile uint8_t vofa_tx_busy = 0;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /**
@@ -203,26 +209,11 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_TIM1_Init();
@@ -272,7 +263,6 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
     /* --- 故障恢复逻辑 --- */
     if (g_fault_latch)
@@ -290,13 +280,11 @@ int main(void)
             freq_e        = 0.0f;
             motor_state   = STATE_IF; 
 
-            /* 复位 PLL 内部状态 */
+            /* 复位观测器内部状态 */
             pll_integral = 0.0f;
-            omega_e_est = 0.0f;
-            e_alpha_lpf = 0.0f;
-            e_beta_lpf  = 0.0f;
-            i_alpha_last = 0.0f;
-            i_beta_last  = 0.0f;
+            omega_e_est  = 0.0f;
+            obs_x1       = 0.0f;
+            obs_x2       = 0.0f;
 
             /* 重新使能驱动 */
             HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
@@ -355,7 +343,6 @@ void SystemClock_Config(void)
 
 /**
   * @brief 定时器周期回调（1kHz） - 速度环与保护
-  * @param htim 定时器句柄
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -366,39 +353,41 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
          * ======================================================== */
         if (motor_state == STATE_RUN)
         {
-            run_timer++;
+             if (run_timer < 65535) run_timer++; 
             
             /* 阶段 A：纯电流闭环缓冲期 (500ms) */
-            if (run_timer < 500) 
-            {
+            if (run_timer < 200) 
+            {		
                 iq_ref = IF_START_IQ; 
                 integral_spd = IF_START_IQ; 
             }
-            /* 阶段 B：速度环正式接管 */
+             /* 阶段 B：速度环正式接管 */
             else
             {
                 float err_spd = spd_target_rpm - speed_rpm_est;
                 
-                /* 数值异常拦截 */
+                /* 1. 拦截异常与死区 */
                 if (isnan(err_spd) || isinf(err_spd)) err_spd = 0.0f;
+                if (err_spd > -20.0f && err_spd < 20.0f) err_spd = 0.0f; // 扩大死区，容许 20 RPM 的误差
                 
-                /* 速度死区：防静差抖动 */
-                if (err_spd > -10.0f && err_spd < 10.0f) err_spd = 0.0f;
+                /* 2. 误差限幅 */
+                if (err_spd > 100.0f)  err_spd = 100.0f;  
+                if (err_spd < -100.0f) err_spd = -100.0f;
                 
-                /* 误差限幅 */
-                if (err_spd > 200.0f)  err_spd = 200.0f;  
-                if (err_spd < -200.0f) err_spd = -200.0f;
-                
-                /* 积分累加与抗饱和 */
+                /* 3. 积分累加与抗饱和 (Anti-Windup) */
                 integral_spd += SPD_KI * err_spd;
-                if (integral_spd > 4.0f)  integral_spd = 4.0f; 
-                if (integral_spd < -4.0f) integral_spd = -4.0f;
+                if (integral_spd > 3.0f)  integral_spd = 3.0f; // 积分上限压到 3A，防止过热
+                if (integral_spd < -3.0f) integral_spd = -3.0f;
                 
-                /* 综合 Iq 目标计算 */
+                /* 4. 计算目标电流 */
                 float iq_target = SPD_KP * err_spd + integral_spd;
-                if (iq_target > 7.0f)  iq_target = 7.0f;
+                
+                /* 5. 输出限幅 */
+                if (iq_target > 5.0f)  iq_target = 5.0f;
                 if (iq_target < -5.0f) iq_target = -5.0f;
                 
+                /* 6. 直接赋值，取消缓慢斜坡（因为有了速度滤波，PI 本身就会平滑输出） */
+								
                 iq_ref = iq_target;
             }
         }
@@ -408,11 +397,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             integral_spd = 0.0f; 
             run_timer = 0;
         }
+				if (motor_state == STATE_IF) 
+				{
+						/* 强拖阶段，强制计算速度，但【绝对不要】清空 obs_x1 和 obs_x2！ */
+						omega_e_est = 6.28318531f * freq_e; 
+						speed_rpm_est = (omega_e_est / MOTOR_POLE_PAIRS) * (60.0f / 6.28318531f);
+				}
+				
         
-        /* 最终防线：Iq 绝对限幅 */
-        if (isnan(iq_ref) || isinf(iq_ref)) iq_ref = 1.0f;
-        if (iq_ref > 7.0f)  iq_ref = 7.0f;
-        if (iq_ref < -5.0f) iq_ref = -5.0f;
+       
 
         /* ========================================================
          * 2. 母线电压采样与保护
@@ -448,8 +441,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             vofa_tx_frame.ch_data[1] = speed_rpm_est;
             vofa_tx_frame.ch_data[2] = iq_ref;
             vofa_tx_frame.ch_data[3] = i_q;
-            vofa_tx_frame.ch_data[4] = ia;
-            vofa_tx_frame.ch_data[5] = ib;
+            vofa_tx_frame.ch_data[4] = omega_e_est; /* id_ref (预留) */
+            vofa_tx_frame.ch_data[5] = i_d;
             
             if (HAL_UART_Transmit_DMA(&huart1, (uint8_t *)&vofa_tx_frame, sizeof(VOFA_Frame_t)) != HAL_OK) {
                 vofa_tx_busy = 0; 
@@ -470,7 +463,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 /**
   * @brief 串口 DMA 发送完成回调
-  * @param huart 串口句柄
   */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -480,14 +472,13 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 }
 
 /**
-  * @brief 注入转换完成回调（20kHz） - 核心 FOC 与 PLL 观测器
-  * @param hadc ADC 句柄
+  * @brief 注入转换完成回调（20kHz） - 核心 FOC 与 VESC 观测器
   */
 void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
     if (hadc->Instance != ADC2) return;
         
-    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET); /* 测运行时间 */
+    HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET); 
     
     /* ========================================================
      * 0. 电流采样与换算
@@ -499,15 +490,16 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     ic = ((float)raw_rank2 - ic_offset) * CURRENT_SCALE;
     ib = -ia - ic;
 
-		/* ========================================================
+    /* ========================================================
      * 1. 故障锁存检查
      * ======================================================== */
     if (g_fault_latch)
     {
         HAL_ADCEx_InjectedStart_IT(hadc);
-				HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET); /* 记得关掉蓝灯 */
+        HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET); 
         return;
     }
+    
     /* ========================================================
      * 2. 过流检测 (硬阈值 + 软阈值)
      * ======================================================== */
@@ -554,62 +546,86 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     /* ========================================================
      * 3. Clarke & Park 变换
      * ======================================================== */
+    /* 
+     * Clarke 变换 (等幅值):
+     * I_alpha = Ia
+     * I_beta  = (Ia + 2*Ib) / sqrt(3)
+     */
     float sin_e = sinf(theta_e);
     float cos_e = cosf(theta_e);
 
     i_alpha = ia;
     i_beta  = (ia + 2.0f * ib) * 0.57735027f; 
 
+    /* 
+     * Park 变换:
+     * Id =  I_alpha * cos(e) + I_beta * sin(e)
+     * Iq = -I_alpha * sin(e) + I_beta * cos(e)
+     */
     i_d =  i_alpha * cos_e + i_beta * sin_e;
     i_q = -i_alpha * sin_e + i_beta * cos_e;
 
     /* ========================================================
-     * 4. 反电动势 PLL 观测器
+     * 4. VESC 非线性磁链观测器 (Ortega-Praly)
      * ======================================================== */
-    // 4.1 离散化电流差分 (di/dt)
-    float di_alpha = (i_alpha - i_alpha_last) * FOC_FREQ;
-    float di_beta  = (i_beta - i_beta_last) * FOC_FREQ;
-    i_alpha_last = i_alpha;
-    i_beta_last  = i_beta;
-
-    // 4.2 计算反电动势 (含电感补偿)
-    float e_alpha_raw = v_alpha_ref - MOTOR_RS * i_alpha - MOTOR_LS * di_alpha;
-    float e_beta_raw  = v_beta_ref  - MOTOR_RS * i_beta  - MOTOR_LS * di_beta;
-
-    // 4.3 低通滤波提取平滑反电动势
-    e_alpha_lpf = e_alpha_lpf * 0.99f + e_alpha_raw * 0.01f;
-    e_beta_lpf  = e_beta_lpf  * 0.99f + e_beta_raw  * 0.01f;
-
-    // 4.4 锁相环 (PLL) 状态机
     if (motor_state == STATE_IF) 
     {
-        // I/F 强拖阶段：强制同步 PLL 内部状态
-        omega_e_est   = 6.28318531f * freq_e; 
+        /* I/F 强拖阶段，强制角度与速度 */
+        omega_e_est = 6.28318531f * freq_e; 
         speed_rpm_est = (omega_e_est / MOTOR_POLE_PAIRS) * (60.0f / 6.28318531f);
-        pll_integral  = omega_e_est;
+//        obs_x1 = 0.0f; 
+//        obs_x2 = 0.0f;
     }
     else /* STATE_RUN */
     {
-        // 鉴相器：提取 d 轴反电动势误差
-        float e_d = e_alpha_lpf * cos_e + e_beta_lpf * sin_e;
+        /*
+         * VESC 观测器核心公式：
+         * 定义状态变量 X = [x1, x2]^T （定子磁链）
+         * 误差 e = λ^2 - (x1 - Ls*I_alpha)^2 - (x2 - Ls*I_beta)^2
+         * dx1/dt = V_alpha - Rs*I_alpha + γ * e * (x1 - Ls*I_alpha)
+         * dx2/dt = V_beta  - Rs*I_beta  + γ * e * (x2 - Ls*I_beta)
+         */
+        float L_ia = MOTOR_LS * i_alpha;
+        float L_ib = MOTOR_LS * i_beta;
         
-        // 误差防爆限幅
-        if (e_d > 8.0f)  e_d = 8.0f;
-        if (e_d < -8.0f) e_d = -8.0f;
-
-        // 负反馈 PI 控制，锁定频率
-        pll_integral -= e_d * PLL_KI * FOC_DT;
-        if (pll_integral > 2500.0f)  pll_integral = 2500.0f;
-        if (pll_integral < -2500.0f) pll_integral = -2500.0f;
-
-        omega_e_est = pll_integral - e_d * PLL_KP;
+        /* 1. 磁链误差计算 */
+        float lambda_sq = MOTOR_FLUX_LINKAGE * MOTOR_FLUX_LINKAGE;
+        float x1_ia = obs_x1 - L_ia;
+        float x2_ib = obs_x2 - L_ib;
+        float err = lambda_sq - (x1_ia * x1_ia + x2_ib * x2_ib);
         
-        // 防 NaN 与物理限幅
+        /* 2. 状态变量积分（增益自适应） */
+        float gain = OBSERVER_GAIN;
+        obs_x1 += (v_alpha_ref - MOTOR_RS * i_alpha + gain * err * x1_ia) * FOC_DT;
+        obs_x2 += (v_beta_ref  - MOTOR_RS * i_beta  + gain * err * x2_ib) * FOC_DT;
+        
+        /* 3. 提取转子磁链 (去除电感项) */
+        /* Ψ_alpha = x1 - Ls*I_alpha, Ψ_beta = x2 - Ls*I_beta */
+        float flux_alpha = obs_x1 - L_ia;
+        float flux_beta  = obs_x2 - L_ib;
+        
+        /* 4. PLL 锁相环提取速度与角度 */
+        float phase_err = -flux_alpha * sin_e + flux_beta * cos_e;
+        
+        /* 【核心修复】将误差除以磁链幅值，归一化为角度差的正弦值 (范围 -1 ~ 1) 
+           这样 PLL_KP=30 和 PLL_KI=1500 才能真正发挥出强大的追踪能力 */
+        phase_err = phase_err / MOTOR_FLUX_LINKAGE;
+
+        /* PLL 积分 */
+        pll_integral += phase_err * PLL_KI * FOC_DT;
+        if (pll_integral > 3000.0f)  pll_integral = 3000.0f;
+        if (pll_integral < -3000.0f) pll_integral = -3000.0f;
+        
+        /* 估算角速度 */
+        omega_e_est = pll_integral + phase_err * PLL_KP;
+        
+        /* 物理限幅与 NaN 保护 */
         if (isnan(omega_e_est) || isinf(omega_e_est)) omega_e_est = 0.0f;
-        if (omega_e_est > 2500.0f)  omega_e_est = 2500.0f;
-        if (omega_e_est < -2500.0f) omega_e_est = -2500.0f;
+//        if (omega_e_est > 6000.0f)  omega_e_est = 6000.0f;
+//        if (omega_e_est < -6000.0f) omega_e_est = -6000.0f;
+        
+       speed_rpm_est = (omega_e_est / MOTOR_POLE_PAIRS) * (60.0f / 6.28318531f);
 
-        speed_rpm_est = (omega_e_est / MOTOR_POLE_PAIRS) * (60.0f / 6.28318531f);
     }
 
     /* ========================================================
@@ -628,19 +644,27 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
         
         theta_e = theta_if; 
 
-        /* 切入条件判定 */
+                /* 切入条件判定 */
         if (freq_e >= IF_START_FREQ)
         {
             speed_rpm_est = (freq_e * 60.0f) / MOTOR_POLE_PAIRS;
             integral_spd  = IF_START_IQ; 
             
-            /* 无缝接管：同步 PLL 积分器与角度 */
+            /* 无缝接管：只同步 PLL 积分器与角度 */
             pll_integral = 6.28318531f * freq_e;
             theta_est    = theta_if; 
             
+            /* 【核心修复】删掉以下所有强行赋初值的代码！
+             * 让 obs_x1 和 obs_x2 保持原有积分状态，观测器会利用闭环的电压和电流自然收敛
+             */
+            // float flux_alpha_init = MOTOR_FLUX_LINKAGE * cosf(theta_if);
+            // float flux_beta_init  = MOTOR_FLUX_LINKAGE * sinf(theta_if);
+            // obs_x1 = flux_alpha_init + MOTOR_LS * i_alpha;
+            // obs_x2 = flux_beta_init  + MOTOR_LS * i_beta;
+            
             /* 重置电流环积分，防止电流冲击 */
-            integral_d = v_d - PI_KP * (0.0f - i_d);
-            integral_q = v_q - PI_KP * (iq_ref - i_q);
+            integral_d = v_d - CURRENT_KP * (0.0f - i_d);
+            integral_q = v_q - CURRENT_KP * (iq_ref - i_q);
             
             run_timer    = 0; 
             motor_state  = STATE_RUN;
@@ -657,54 +681,85 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     }
 
     /* ========================================================
-     * 6. 电流环 PI 控制器
+     * 6. VESC 电流环：PI + 解耦 + 电压圆限幅
      * ======================================================== */
-    /* 使用最新角度重新计算 D/Q 轴反馈 */
     sin_e = sinf(theta_e);
     cos_e = cosf(theta_e);
     i_d =  i_alpha * cos_e + i_beta * sin_e;
     i_q = -i_alpha * sin_e + i_beta * cos_e;
 
+    /* 误差计算 (Id_ref 设为 0) */
     float err_d = 0.0f - i_d; 
     float err_q = iq_ref - i_q;
 
-    integral_d += PI_KI * err_d;
-    integral_q += PI_KI * err_q;
+    /* 1. PI 控制（使用带宽法增益） */
+    v_d = CURRENT_KP * err_d + integral_d;
+    v_q = CURRENT_KP * err_q + integral_q;
+
+    /* 2. 交叉耦合解耦（VESC 默认启用） */
+    #if USE_DECOUPLING
+        /* 解耦公式：Vd -= ω * Ls * Iq, Vq += ω * Ls * Id */
+        float decouple_d = -omega_e_est * MOTOR_LS * i_q;
+        float decouple_q =  omega_e_est * MOTOR_LS * i_d;
+        
+        v_d += decouple_d;
+        v_q += decouple_q;
+    #endif
+
+    /* 3. 积分器更新与抗饱和（电压圆限幅） */
+    float v_mag = sqrtf(v_d * v_d + v_q * v_q);
+    float v_limit = vbus_voltage * 0.57735f; /* SVPWM 线性区最大相电压 (Vbus / sqrt(3)) */
     
-    /* 积分抗饱和 */
-    if (integral_d > V_OUT_MAX)  integral_d = V_OUT_MAX;
-    if (integral_d < -V_OUT_MAX) integral_d = -V_OUT_MAX;
-    if (integral_q > V_OUT_MAX)  integral_q = V_OUT_MAX;
-    if (integral_q < -V_OUT_MAX) integral_q = -V_OUT_MAX;
-
-    v_d = PI_KP * err_d + integral_d;
-    v_q = PI_KP * err_q + integral_q;
-
-    /* 输出限幅 */
-    if (v_d > V_OUT_MAX)  v_d = V_OUT_MAX;
-    if (v_d < -V_OUT_MAX) v_d = -V_OUT_MAX;
-    if (v_q > V_OUT_MAX)  v_q = V_OUT_MAX;
-    if (v_q < -V_OUT_MAX) v_q = -V_OUT_MAX;
+    if (v_mag > v_limit) 
+    {
+        /* 电压矢量饱和，按比例缩小输出 (圆限幅)，且停止积分累加 */
+        float scale = v_limit / v_mag;
+        v_d *= scale;
+        v_q *= scale;
+    }
+    else
+    {
+        /* 未饱和时正常积分 */
+        integral_d += CURRENT_KI * err_d * FOC_DT;
+        integral_q += CURRENT_KI * err_q * FOC_DT;
+    }
+    
+    /* 积分器独立限幅（防止深度饱和后恢复缓慢） */
+    if (integral_d > v_limit)  integral_d = v_limit;
+    if (integral_d < -v_limit) integral_d = -v_limit;
+    if (integral_q > v_limit)  integral_q = v_limit;
+    if (integral_q < -v_limit) integral_q = -v_limit;
 
     /* ========================================================
      * 7. 反 Park 变换 & SVPWM 零序注入
      * ======================================================== */
+    /* 
+     * 反 Park 变换:
+     * V_alpha = Vd * cos(e) - Vq * sin(e)
+     * V_beta  = Vd * sin(e) + Vq * cos(e)
+     */
     v_alpha_ref = v_d * cos_e - v_q * sin_e;
     v_beta_ref  = v_d * sin_e + v_q * cos_e;
 
-    /* 反 Clarke 得到三相电压参考 */
+    /* 
+     * 反 Clarke 变换 (得到三相参考):
+     * Va = V_alpha
+     * Vb = -0.5*V_alpha + sqrt(3)/2 * V_beta
+     * Vc = -0.5*V_alpha - sqrt(3)/2 * V_beta
+     */
     float va_ref = v_alpha_ref;
     float vb_ref = -0.5f * v_alpha_ref + 0.86602540f * v_beta_ref;
     float vc_ref = -0.5f * v_alpha_ref - 0.86602540f * v_beta_ref;
 
     /* 提取最大最小值进行零序注入 (等效 SVPWM) */
-    float v_max = va_ref, v_min = va_ref;
-    if (vb_ref > v_max) v_max = vb_ref;
-    if (vc_ref > v_max) v_max = vc_ref;
-    if (vb_ref < v_min) v_min = vb_ref;
-    if (vc_ref < v_min) v_min = vc_ref;
+    float v_max_svpwm = va_ref, v_min_svpwm = va_ref;
+    if (vb_ref > v_max_svpwm) v_max_svpwm = vb_ref;
+    if (vc_ref > v_max_svpwm) v_max_svpwm = vc_ref;
+    if (vb_ref < v_min_svpwm) v_min_svpwm = vb_ref;
+    if (vc_ref < v_min_svpwm) v_min_svpwm = vc_ref;
     
-    float v_common = -(v_max + v_min) * 0.5f;
+    /* 零序注入公式：V_common = -(V_max + V_min) / 2 */
+    float v_common = -(v_max_svpwm + v_min_svpwm) * 0.5f;
     va_ref += v_common;
     vb_ref += v_common;
     vc_ref += v_common;
@@ -715,6 +770,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     float vbus_safe = vbus_voltage;
     if (vbus_safe < 10.0f) vbus_safe = 10.0f; /* 防止除零 */
 
+    /* 占空比公式：duty = 0.5 + V_phase / Vbus */
     float duty_a = 0.5f + va_ref / vbus_safe;
     float duty_b = 0.5f + vb_ref / vbus_safe;
     float duty_c = 0.5f + vc_ref / vbus_safe;
