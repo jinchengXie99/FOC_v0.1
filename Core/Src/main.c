@@ -54,13 +54,13 @@
 /* ============================================================
  * 1. 电机物理参数
  * ============================================================ */
-#define MOTOR_RS            0.3644f/2.0f        /* 定子相电阻 (Ω) */
-#define MOTOR_LS            0.0000829f/2.0f     /* 定子相电感 (H) */
-#define MOTOR_POLE_PAIRS    7.0f                /* 极对数 */
+#define MOTOR_RS            0.0513f/2.0f        /* 定子相电阻 (Ω) */
+#define MOTOR_LS            0.0000328f/2.0f     /* 定子相电感 (H) */
+#define MOTOR_POLE_PAIRS    1.0f                /* 极对数 */
 
 /* --- 反电动势实测数据 --- */
-#define MOTOR_VPP_LINE      11.98f              /* 线反电动势峰峰值 (V) */
-#define MOTOR_F_E           203.73f             /* 反电动势测试频率 (Hz) */
+#define MOTOR_VPP_LINE      10.1f              /* 线反电动势峰峰值 (V) */
+#define MOTOR_F_E           410.2f             /* 反电动势测试频率 (Hz) */
 
 /* --- 磁链计算常数 --- */
 /* 推导过程： 1 / (4 * sqrt(3) * pi) 
@@ -82,15 +82,15 @@
 #define FOC_DT              (1.0f / FOC_FREQ)   /* 控制周期 50us */
 
 /* --- 启动与切入参数 --- */
-#define IF_START_FREQ       30.0f               /* I/F 强拖目标频率 (Hz) */
-#define IF_RAMP_RATE        15.0f               /* I/F 加速斜坡 (Hz/s) */
-#define IF_START_IQ         0.8f                /* I/F 启动给定电流 (A) */
+#define IF_START_FREQ        50.0f               /* I/F 强拖目标频率 (Hz) */
+#define IF_RAMP_RATE         15.0f               /* I/F 加速斜坡 (Hz/s) */
+#define IF_START_IQ          2.0f                /* I/F 启动给定电流 (A) */
 
 /* --- VESC 非线性磁链观测器参数 --- */
 #define OBSERVER_GAIN       1200.0f              /* 观测器增益，典型 500~2000 */
 
 /* --- VESC 电流环参数 (带宽法) --- */
-#define CURRENT_BANDWIDTH   3000.0f             /* 电流环带宽 (rad/s) */
+#define CURRENT_BANDWIDTH   3000.0f              /* 电流环带宽 (rad/s) */
 #define USE_DECOUPLING      1                   /* 1: 启用交叉耦合解耦, 0: 禁用 */
 
 /* VESC 核心公式：根据带宽自动计算 PI 增益 (V/A) */
@@ -98,9 +98,9 @@
 #define CURRENT_KI  (MOTOR_RS * CURRENT_BANDWIDTH)
 
 /* --- 速度环 PI 参数 --- */
-#define SPD_KP              0.001f       
-#define SPD_KI              0.00001f      
-#define SPD_TARGET_RPM      1000.0f             /* 目标机械转速 (RPM) */
+#define SPD_KP              0.01f       
+#define SPD_KI              0.0001f      
+#define SPD_TARGET_RPM      30000.0f             /* 目标机械转速 (RPM) */
 
 /* --- PLL 锁相环参数 (用于从磁链提取角度) --- */
 #define PLL_KP              50.0f               
@@ -159,8 +159,8 @@ volatile float vbus_voltage = 24.0f;
 volatile float v_amp = 0.0f;
 
 /* 故障阈值设定 */
-#define OC_HARD_LIMIT_A     15.0f
-#define OC_SOFT_LIMIT_A     10.0f
+#define OC_HARD_LIMIT_A     30.0f
+#define OC_SOFT_LIMIT_A     18.0f
 #define OC_DEBOUNCE_CNT     5
 #define OVP_THRESHOLD       30.0f    
 #define OVP_RECOVER         29.0f    
@@ -371,20 +371,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
                 if (err_spd > -20.0f && err_spd < 20.0f) err_spd = 0.0f; // 扩大死区，容许 20 RPM 的误差
                 
                 /* 2. 误差限幅 */
-                if (err_spd > 100.0f)  err_spd = 100.0f;  
-                if (err_spd < -100.0f) err_spd = -100.0f;
+                if (err_spd > 1000.0f)  err_spd = 1000.0f;  
+                if (err_spd < -1000.0f) err_spd = -1000.0f;
                 
                 /* 3. 积分累加与抗饱和 (Anti-Windup) */
                 integral_spd += SPD_KI * err_spd;
-                if (integral_spd > 3.0f)  integral_spd = 3.0f; // 积分上限压到 3A，防止过热
-                if (integral_spd < -3.0f) integral_spd = -3.0f;
+                if (integral_spd > 15.0f)  integral_spd = 15.0f; // 积分上限压到 3A，防止过热
+                if (integral_spd < -15.0f) integral_spd = -15.0f;
                 
                 /* 4. 计算目标电流 */
                 float iq_target = SPD_KP * err_spd + integral_spd;
                 
                 /* 5. 输出限幅 */
-                if (iq_target > 5.0f)  iq_target = 5.0f;
-                if (iq_target < -5.0f) iq_target = -5.0f;
+                if (iq_target > 15.0f)  iq_target = 15.0f;
+                if (iq_target < -15.0f) iq_target = -15.0f;
                 
                 /* 6. 直接赋值，取消缓慢斜坡（因为有了速度滤波，PI 本身就会平滑输出） */
 								
@@ -441,8 +441,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             vofa_tx_frame.ch_data[1] = speed_rpm_est;
             vofa_tx_frame.ch_data[2] = iq_ref;
             vofa_tx_frame.ch_data[3] = i_q;
-            vofa_tx_frame.ch_data[4] = omega_e_est; /* id_ref (预留) */
-            vofa_tx_frame.ch_data[5] = i_d;
+            vofa_tx_frame.ch_data[4] = v_d; 
+            vofa_tx_frame.ch_data[5] = v_q;
             
             if (HAL_UART_Transmit_DMA(&huart1, (uint8_t *)&vofa_tx_frame, sizeof(VOFA_Frame_t)) != HAL_OK) {
                 vofa_tx_busy = 0; 
