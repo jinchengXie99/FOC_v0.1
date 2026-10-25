@@ -82,15 +82,15 @@
 #define FOC_DT              (1.0f / FOC_FREQ)   /* 控制周期 50us */
 
 /* --- 启动与切入参数 --- */
-#define IF_START_FREQ        50.0f               /* I/F 强拖目标频率 (Hz) */
-#define IF_RAMP_RATE         15.0f               /* I/F 加速斜坡 (Hz/s) */
+#define IF_START_FREQ        30.0f               /* I/F 强拖目标频率 (Hz) */
+#define IF_RAMP_RATE         30.0f               /* I/F 加速斜坡 (Hz/s) */
 #define IF_START_IQ          2.0f                /* I/F 启动给定电流 (A) */
 
 /* --- VESC 非线性磁链观测器参数 --- */
-#define OBSERVER_GAIN       1200.0f              /* 观测器增益，典型 500~2000 */
+#define OBSERVER_GAIN       300.0f              /* 观测器增益，典型 500~2000 */
 
 /* --- VESC 电流环参数 (带宽法) --- */
-#define CURRENT_BANDWIDTH   3000.0f              /* 电流环带宽 (rad/s) */
+#define CURRENT_BANDWIDTH   1000.0f              /* 电流环带宽 (rad/s) */
 #define USE_DECOUPLING      1                   /* 1: 启用交叉耦合解耦, 0: 禁用 */
 
 /* VESC 核心公式：根据带宽自动计算 PI 增益 (V/A) */
@@ -98,12 +98,12 @@
 #define CURRENT_KI  (MOTOR_RS * CURRENT_BANDWIDTH)
 
 /* --- 速度环 PI 参数 --- */
-#define SPD_KP              0.01f       
-#define SPD_KI              0.0001f      
-#define SPD_TARGET_RPM      30000.0f             /* 目标机械转速 (RPM) */
+#define SPD_KP              0.0013f       
+#define SPD_KI              0.00001f      
+#define SPD_TARGET_RPM      20000.0f             /* 目标机械转速 (RPM) */
 
 /* --- PLL 锁相环参数 (用于从磁链提取角度) --- */
-#define PLL_KP              50.0f               
+#define PLL_KP              100.0f               
 #define PLL_KI              3000.0f             
 
 /* ============================================================
@@ -160,7 +160,7 @@ volatile float v_amp = 0.0f;
 
 /* 故障阈值设定 */
 #define OC_HARD_LIMIT_A     30.0f
-#define OC_SOFT_LIMIT_A     18.0f
+#define OC_SOFT_LIMIT_A     25.0f
 #define OC_DEBOUNCE_CNT     5
 #define OVP_THRESHOLD       30.0f    
 #define OVP_RECOVER         29.0f    
@@ -355,8 +355,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         {
              if (run_timer < 65535) run_timer++; 
             
-            /* 阶段 A：纯电流闭环缓冲期 (500ms) */
-            if (run_timer < 200) 
+            /* 阶段 A：纯电流闭环缓冲期 (100ms) */
+            if (run_timer < 10) 
             {		
                 iq_ref = IF_START_IQ; 
                 integral_spd = IF_START_IQ; 
@@ -371,20 +371,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
                 if (err_spd > -20.0f && err_spd < 20.0f) err_spd = 0.0f; // 扩大死区，容许 20 RPM 的误差
                 
                 /* 2. 误差限幅 */
-                if (err_spd > 1000.0f)  err_spd = 1000.0f;  
-                if (err_spd < -1000.0f) err_spd = -1000.0f;
+                if (err_spd > 50000.0f)  err_spd = 50000.0f;  
+                if (err_spd < -50000.0f) err_spd = -50000.0f;
                 
                 /* 3. 积分累加与抗饱和 (Anti-Windup) */
                 integral_spd += SPD_KI * err_spd;
-                if (integral_spd > 15.0f)  integral_spd = 15.0f; // 积分上限压到 3A，防止过热
-                if (integral_spd < -15.0f) integral_spd = -15.0f;
+                if (integral_spd > 18.0f)  integral_spd = 18.0f; // 积分上限压到 3A，防止过热
+                if (integral_spd < -18.0f) integral_spd = -18.0f;
                 
                 /* 4. 计算目标电流 */
                 float iq_target = SPD_KP * err_spd + integral_spd;
                 
                 /* 5. 输出限幅 */
-                if (iq_target > 15.0f)  iq_target = 15.0f;
-                if (iq_target < -15.0f) iq_target = -15.0f;
+                if (iq_target > 18.0f)  iq_target = 18.0f;
+                if (iq_target < -18.0f) iq_target = -18.0f;
                 
                 /* 6. 直接赋值，取消缓慢斜坡（因为有了速度滤波，PI 本身就会平滑输出） */
 								
@@ -573,8 +573,8 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
         /* I/F 强拖阶段，强制角度与速度 */
         omega_e_est = 6.28318531f * freq_e; 
         speed_rpm_est = (omega_e_est / MOTOR_POLE_PAIRS) * (60.0f / 6.28318531f);
-//        obs_x1 = 0.0f; 
-//        obs_x2 = 0.0f;
+        obs_x1 = 0.0f; 
+        obs_x2 = 0.0f;
     }
     else /* STATE_RUN */
     {
