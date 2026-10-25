@@ -82,15 +82,15 @@
 #define FOC_DT              (1.0f / FOC_FREQ)   /* 控制周期 50us */
 
 /* --- 启动与切入参数 --- */
-#define IF_START_FREQ       30.0f               /* I/F 强拖目标频率 (Hz) */
-#define IF_RAMP_RATE        15.0f               /* I/F 加速斜坡 (Hz/s) */
-#define IF_START_IQ         0.8f                /* I/F 启动给定电流 (A) */
+#define IF_START_FREQ        10.0f               /* I/F 强拖目标频率 (Hz) */
+#define IF_RAMP_RATE         20.0f               /* I/F 加速斜坡 (Hz/s) */
+#define IF_START_IQ          0.6f                /* I/F 启动给定电流 (A) */
 
 /* --- VESC 非线性磁链观测器参数 --- */
-#define OBSERVER_GAIN       1200.0f              /* 观测器增益，典型 500~2000 */
+#define OBSERVER_GAIN       1000.0f              /* 观测器增益，典型 500~2000 */
 
 /* --- VESC 电流环参数 (带宽法) --- */
-#define CURRENT_BANDWIDTH   3000.0f             /* 电流环带宽 (rad/s) */
+#define CURRENT_BANDWIDTH   1000.0f              /* 电流环带宽 (rad/s) */
 #define USE_DECOUPLING      1                   /* 1: 启用交叉耦合解耦, 0: 禁用 */
 
 /* VESC 核心公式：根据带宽自动计算 PI 增益 (V/A) */
@@ -103,7 +103,7 @@
 #define SPD_TARGET_RPM      1000.0f             /* 目标机械转速 (RPM) */
 
 /* --- PLL 锁相环参数 (用于从磁链提取角度) --- */
-#define PLL_KP              50.0f               
+#define PLL_KP              30.0f               
 #define PLL_KI              3000.0f             
 
 /* ============================================================
@@ -159,8 +159,8 @@ volatile float vbus_voltage = 24.0f;
 volatile float v_amp = 0.0f;
 
 /* 故障阈值设定 */
-#define OC_HARD_LIMIT_A     15.0f
-#define OC_SOFT_LIMIT_A     10.0f
+#define OC_HARD_LIMIT_A     25.0f
+#define OC_SOFT_LIMIT_A     20.0f
 #define OC_DEBOUNCE_CNT     5
 #define OVP_THRESHOLD       30.0f    
 #define OVP_RECOVER         29.0f    
@@ -355,8 +355,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         {
              if (run_timer < 65535) run_timer++; 
             
-            /* 阶段 A：纯电流闭环缓冲期 (500ms) */
-            if (run_timer < 200) 
+            /* 阶段 A：纯电流闭环缓冲期 (100ms) */
+            if (run_timer < 10) 
             {		
                 iq_ref = IF_START_IQ; 
                 integral_spd = IF_START_IQ; 
@@ -368,23 +368,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
                 
                 /* 1. 拦截异常与死区 */
                 if (isnan(err_spd) || isinf(err_spd)) err_spd = 0.0f;
-                if (err_spd > -20.0f && err_spd < 20.0f) err_spd = 0.0f; // 扩大死区，容许 20 RPM 的误差
+                if (err_spd > -20.0f && err_spd < 20.0f) err_spd = 0.0f; // 扩大死区，容许 5 RPM 的误差
                 
                 /* 2. 误差限幅 */
-                if (err_spd > 100.0f)  err_spd = 100.0f;  
-                if (err_spd < -100.0f) err_spd = -100.0f;
+                if (err_spd > 5000.0f)  err_spd = 5000.0f;  
+                if (err_spd < -5000.0f) err_spd = -5000.0f;
                 
                 /* 3. 积分累加与抗饱和 (Anti-Windup) */
                 integral_spd += SPD_KI * err_spd;
-                if (integral_spd > 3.0f)  integral_spd = 3.0f; // 积分上限压到 3A，防止过热
-                if (integral_spd < -3.0f) integral_spd = -3.0f;
+                if (integral_spd > 18.0f)  integral_spd = 18.0f; // 积分上限压到 3A，防止过热
+                if (integral_spd < -10.0f) integral_spd = -10.0f;
                 
                 /* 4. 计算目标电流 */
                 float iq_target = SPD_KP * err_spd + integral_spd;
                 
                 /* 5. 输出限幅 */
-                if (iq_target > 5.0f)  iq_target = 5.0f;
-                if (iq_target < -5.0f) iq_target = -5.0f;
+                if (iq_target > 18.0f)  iq_target = 18.0f;
+                if (iq_target < -10.0f) iq_target = -10.0f;
                 
                 /* 6. 直接赋值，取消缓慢斜坡（因为有了速度滤波，PI 本身就会平滑输出） */
 								
@@ -441,8 +441,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             vofa_tx_frame.ch_data[1] = speed_rpm_est;
             vofa_tx_frame.ch_data[2] = iq_ref;
             vofa_tx_frame.ch_data[3] = i_q;
-            vofa_tx_frame.ch_data[4] = omega_e_est; /* id_ref (预留) */
-            vofa_tx_frame.ch_data[5] = i_d;
+            vofa_tx_frame.ch_data[4] = v_d; 
+            vofa_tx_frame.ch_data[5] = v_q;
             
             if (HAL_UART_Transmit_DMA(&huart1, (uint8_t *)&vofa_tx_frame, sizeof(VOFA_Frame_t)) != HAL_OK) {
                 vofa_tx_busy = 0; 
@@ -573,8 +573,8 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
         /* I/F 强拖阶段，强制角度与速度 */
         omega_e_est = 6.28318531f * freq_e; 
         speed_rpm_est = (omega_e_est / MOTOR_POLE_PAIRS) * (60.0f / 6.28318531f);
-//        obs_x1 = 0.0f; 
-//        obs_x2 = 0.0f;
+        obs_x1 = 0.0f; 
+        obs_x2 = 0.0f;
     }
     else /* STATE_RUN */
     {
