@@ -58,3 +58,4 @@ Drivers/CMSIS/Device/ST/STM32G4xx/LICENSE.txt
 MDK-ARM/DebugConfig/FOC_v0.1_STM32G431RBTx.dbgconf
 MDK-ARM/startup_stm32g431xx.lst
 
+MDK-ARM/FOC_v0.1.uvprojx
