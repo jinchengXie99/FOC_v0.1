@@ -1,0 +1,120 @@
+├── 0_Config/                   // 集中配置层 (不包含任何 C 代码逻辑)
+│   ├── mtr_config.h            // 电机物理参数 (Rs/Ls/Flux/PolePairs)、限幅阈值
+│   └── drv_config.h            // 硬件相关宏 (PWM频率、死区时间、ADC偏置常数)
+│
+├── 1_HW_Driver/                // 硬件抽象层 (Board Support Package)
+│   ├── hw_pwm.c/.h             // 底层寄存器级 PWM 驱动 (极速写入 CCR)
+│   ├── hw_adc.c/.h             // ADC 双电阻/三电阻重构、偏置自动校准、DMA管理
+│   ├── hw_gpio.c/.h            // 驱动芯片使能(SD引脚)、故障读取、LED指示
+│   └── hw_dsp.c/.h             // 硬件加速层 (CORDIC sin/cos/sqrt, 快速浮点运算)
+│
+├── 2_Math_Algo/                // 纯数学算法层 (完全解耦，无硬件依赖，可单测)
+│   ├── math_foc.c/.h           // Clarke, Park, 反Park 变换
+│   ├── math_svpwm.c/.h          // 七段式/五段式 SVPWM，过调制处理，扇区计算
+│   └── math_pid.c/.h           // 标准化 PID (抗积分饱和、微分先行、归一化输出)
+│
+├── 3_Motor_Control/            // 电机核心控制层 (高频 20kHz 域)
+│   ├── ctrl_observer.c/.h      // 磁链观测器 + PLL (输出角度和速度)
+│   ├── ctrl_current_loop.c/.h  // 电流环闭环控制
+│   ├── ctrl_advanced.c/.h      // MTPA、弱磁(FW)、过调制策略
+│   └── ctrl_state_machine.c/.h // 核心状态机 (STOP, IF强拖, RUN, BRAKE, FAULT)
+│
+├── 4_Safety_Manager/           // 安全与保护层 (大厂必配)
+│   ├── safe_fault.c/.h         // 故障汇总、消抖、故障码锁存(防止反复启停)
+│   └── safe_limits.c/.h        // 动态限幅 (基于母线电压、温度、转速动态调整最大电流)
+│
+├── 5_App_Logic/                // 应用业务层 (低频 1kHz 域)
+│   ├── app_main.c/.h           // 1kHz 调度器、速度环调用、系统初始化
+│   ├── app_throttle.c/.h       // 滑动变阻器/遥控信号处理、滤波、死区、目标转速映射
+│   └── app_telemetry.c/.h      // 遥测通信 (VOFA+ 数据打包与 DMA 发送)
+│
+└── main.c                      // CubeMX 初始化 + 极简的 while(1)
+
+1. 配置层 (0_Config)
+mtr_config.h
+
+职责：定义电机物理模型。如相电阻、电感、极对数、磁链。这里是纯参数，不能包含任何 extern 变量或函数声明。
+
+大厂做法：将配置与代码剥离，未来若更换电机，只需替换此文件，不需要动核心 C 代码。
+
+drv_config.h
+
+职责：绑定硬件。定义 PWM_FREQ、ADC_REF_VOLTAGE、SHUNT_RESISTANCE、电流运放增益等。
+
+2. 硬件驱动层 (1_HW_Driver)
+hw_pwm.c/.h
+
+职责：封装 TIM1。核心函数 void HW_PWM_SetDuty(float a, float b, float c)。直接操作 TIM1->CCR1，不调用 HAL 库，要求执行时间 < 1us。
+
+大厂做法：提供 HW_PWM_Disable() 宏，拉低 SD 引脚的同时，直接触发 TIM1->EGR = TIM_EGR_BG（软件刹车），确保微秒级物理切断。
+
+hw_adc.c/.h
+
+职责：处理 ADC2 注入组和规则组。提供 HW_ADC_GetCurrents()，直接从 ADC2->JDR1 读值，结合校准好的 Offset 转化为浮点安培数。
+
+大厂做法：包含偏置校准函数 HW_ADC_CalibrateOffsets()，在初始化时阻塞运行，剔除异常值后求均值。
+
+hw_dsp.c/.h
+
+职责：调用 G4 的 CORDIC 加速器。
+
+性能考量：将标准库的 sinf、cosf、sqrtf 替换为 HW_DSP_Sin() 等。在 20kHz 中断中，这能省下约 5-10us 的 CPU 时间，直接决定系统能否跑高转速。
+
+3. 数学算法层 (2_Math_Algo)
+math_foc.c/.h & math_svpwm.c/.h
+
+职责：绝对纯粹的数学运算。输入电压/电流/角度，输出占空比。
+
+大厂做法：传入指针（const float *in, float *out）或结构体。内部不使用任何全局变量，这样工程师可以在 PC 上写一段 C 代码直接测试此函数的正确性，无需连接示波器和电机。
+
+math_pid.c/.h
+
+职责：标准 PID 控制器。结构体中包含 Kp/Ki/Kd、积分累加器、限幅值。
+
+大厂做法：输出为 -1.0 ~ 1.0 的归一化值，由上层乘以最大电流/最大电压。自带 Anti-Windup 逻辑（积分钳位、反向退饱和）。
+
+4. 核心控制层 (3_Motor_Control)
+ctrl_state_machine.c/.h
+
+职责：决策中心。管理 STATE_IDLE、STATE_ALIGN（预定位）、STATE_IF（开环强拖）、STATE_RUN（闭环）、STATE_FAULT。
+
+大厂做法：任何状态的切换都必须满足严格的跳转条件。比如 STATE_IF 切换到 STATE_RUN，必须判断当前转速是否达到阈值，且观测器收敛，最后执行“观测器状态强行对齐”以防止电流冲击。
+
+ctrl_observer.c/.h
+
+职责：VESC Ortega-Praly 观测器与 PLL。
+
+大厂做法：封装为 void CTRL_Observer_Update(Obs_t *obs, float v_alpha, float v_beta, float i_alpha, float i_beta)，内部数据闭环，对外仅输出 omega 和 theta。
+
+ctrl_current_loop.c/.h
+
+职责：高频电流环执行。调用 math_foc 获取当前 
+Id,IqI ，调用 math_pid 计算 Vd,Vq，再进行解耦与限幅。
+
+ctrl_advanced.c/.h
+
+职责：处理复杂的 MTPA 和 弱磁逻辑。对外输出 id_ref 和 iq_ref。这里包含大厂的核心防御逻辑：弱磁防失控回退（Backoff）。
+
+5. 安全与保护层 (4_Safety_Manager)
+safe_fault.c/.h
+
+职责：独立于控制环的“熔断器”。在 ADC 中断里只做标志位传递，在 1kHz 任务中真正执行锁存。
+
+大厂做法：引入故障等级（警告、降额、停机），并记录故障发生瞬间的历史工况（电压、电流、转速），方便售后读取黑匣子数据。
+
+safe_limits.c/.h
+
+职责：动态限幅。因为电机在高速时，最大可用电流受限于电压圆，在高温时受限于热保护。
+
+6. 应用层 (5_App_Logic)
+app_main.c/.h
+
+职责：1kHz 核心调度器。在这里依次调用：safe_fault检查 -> app_throttle解析 -> 速度环 PID -> 输出 iq_ref -> app_telemetry发送。
+
+app_throttle.c/.h
+
+职责：接收滑动变阻器的 ADC 值。执行滑动滤波，限制斜率（防止用户猛拧导致过流），并映射到目标转速。
+
+app_telemetry.c/.h
+
+职责：非阻塞 DMA 串口发送。通过判断 vofa_tx_busy 标志位，将打包好的数据推给上位机。

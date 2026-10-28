@@ -8,10 +8,12 @@
                 "d:\\LuFei\\demo_programe\\浩盛实验室\\JESC_V0.1\\FOC_v0.1\\Drivers\\STM32G4xx_HAL_Driver\\Inc\\Legacy",
                 "d:\\LuFei\\demo_programe\\浩盛实验室\\JESC_V0.1\\FOC_v0.1\\Drivers\\CMSIS\\Device\\ST\\STM32G4xx\\Include",
                 "d:\\LuFei\\demo_programe\\浩盛实验室\\JESC_V0.1\\FOC_v0.1\\Drivers\\CMSIS\\Include",
+                "d:\\LuFei\\demo_programe\\浩盛实验室\\JESC_V0.1\\FOC_v0.1\\Moter",
                 "D:\\Keil_v5\\ARM\\ARMCC\\include",
                 "d:\\LuFei\\demo_programe\\浩盛实验室\\JESC_V0.1\\FOC_v0.1\\MDK-ARM",
                 "d:\\LuFei\\demo_programe\\浩盛实验室\\JESC_V0.1\\FOC_v0.1\\Core\\Src",
-                "d:\\LuFei\\demo_programe\\浩盛实验室\\JESC_V0.1\\FOC_v0.1\\Drivers\\STM32G4xx_HAL_Driver\\Src"
+                "d:\\LuFei\\demo_programe\\浩盛实验室\\JESC_V0.1\\FOC_v0.1\\Drivers\\STM32G4xx_HAL_Driver\\Src",
+                "d:\\LuFei\\demo_programe\\浩盛实验室\\JESC_V0.1\\FOC_v0.1"
             ],
             "defines": [
                 "USE_HAL_DRIVER",
