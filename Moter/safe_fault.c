@@ -83,9 +83,12 @@ void SAFE_HandleFault(void) {
             g_motor.fault_code = 0;
             g_motor.state = STATE_IDLE;
             Ctrl_Observer_Init(&g_motor.obs);
-            Math_PID_Reset(&g_motor.pid_spd);
-            Math_PID_Reset(&g_motor.pid_id);
-            Math_PID_Reset(&g_motor.pid_iq);
+							
+						Speed_PI_Reset(&g_motor.pi_speed);
+						Current_PI_Reset(&g_motor.pi_id);
+						Current_PI_Reset(&g_motor.pi_iq);
+ 
+							
             soft_overcurrent_count = 0U;
             g_motor.iq_ref = 0.0f;
             g_motor.id_mtpa_ref = 0.0f;

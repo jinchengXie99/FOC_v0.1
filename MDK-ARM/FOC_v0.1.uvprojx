@@ -1250,6 +1250,16 @@
               <FileType>5</FileType>
               <FilePath>..\Moter\ctrl_state_machine.h</FilePath>
             </File>
+            <File>
+              <FileName>ctrl_pi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Moter\ctrl_pi.c</FilePath>
+            </File>
+            <File>
+              <FileName>ctrl_pi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Moter\ctrl_pi.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

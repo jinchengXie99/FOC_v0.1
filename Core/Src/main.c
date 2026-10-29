@@ -220,15 +220,16 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     // 2. 换算物理电流
     HW_ADC_GetCurrents(&g_motor.i_a, &g_motor.i_b, &g_motor.i_c);
 
-    if (g_motor.state == STATE_FAULT || g_motor.state == STATE_IDLE) {
+    if (g_motor.state == STATE_FAULT) {
         return;
     }
 		
     if (SAFE_CheckCurrentFast(g_motor.i_a, g_motor.i_b, g_motor.i_c) != FAULT_NONE) {
         return;
     }
-
-   
+    if (g_motor.state == STATE_IDLE) {
+        return;
+    }
 
     // 3. Clarke 变换 (计算 I_alpha, I_beta)
     g_motor.i_alpha = g_motor.i_a;
@@ -290,7 +291,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
         // 2. 滑动变阻器电压处理与目标转速映射
         float throttle_v = HW_ADC_GetThrottleVoltage();
-        APP_Throttle_Update(throttle_v, &g_motor.target_rpm);
+        float target_rpm;
+        APP_Throttle_Update(throttle_v, &target_rpm);
+        g_motor.target_rpm = target_rpm;
 
         // 油门归零时安全停机；空闲时只在母线正常且油门有效时启动。
         if (g_motor.state != STATE_FAULT) {
@@ -299,7 +302,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             } else if (g_motor.state == STATE_IDLE &&
                        vbus > DRV_UVP_RECOVER &&
                        vbus < DRV_OVP_RECOVER) {
-                HW_PWM_SetDuty(0.5f, 0.5f, 0.5f);
                 g_motor.state = STATE_IF;
             }
         }
@@ -309,34 +311,38 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
         // 4. 速度环与高级算法 (仅在闭环运行下生效)
         if (g_motor.state == STATE_RUN) {
-            if (g_motor.run_timer < 10U) {
-                g_motor.run_timer++;
-                g_motor.pid_spd.integral = IF_START_IQ;
+            if (g_motor.run_timer <= 20U) {
+                g_motor.pi_speed.integral = IF_START_IQ;
                 g_motor.iq_ref = IF_START_IQ;
             } else {
-                float speed_error = g_motor.target_rpm - g_motor.obs.speed_rpm;
-                if (isnan(speed_error) || isinf(speed_error)) {
-                    speed_error = 0.0f;
+                float speed_actual = g_motor.obs.speed_rpm;
+                float speed_error = g_motor.target_rpm - speed_actual;
+                if (isnan(speed_actual) || isinf(speed_actual) ||
+                    isnan(speed_error) || isinf(speed_error)) {
+                    g_motor.iq_ref = 0.0f;
+                    Speed_PI_Reset(&g_motor.pi_speed);
+                } else {
+                    if (fabsf(speed_error) < 10.0f) {
+                        speed_error = 0.0f;
+                    } else if (speed_error > 1000.0f) {
+                        speed_error = 1000.0f;
+                    } else if (speed_error < -1000.0f) {
+                        speed_error = -1000.0f;
+                    }
+
+                    float speed_target = speed_actual + speed_error;
+                    g_motor.iq_ref = Speed_PI_Calc(&g_motor.pi_speed,
+                                                   speed_target,
+                                                   speed_actual,
+                                                   0.001f);
                 }
-                if (fabsf(speed_error) < 20.0f) {
-                    speed_error = 0.0f;
-                } else if (speed_error > 2000.0f) {
-                    speed_error = 2000.0f;
-                } else if (speed_error < -2000.0f) {
-                    speed_error = -2000.0f;
-                }
-                float speed_target = g_motor.obs.speed_rpm + speed_error;
-                g_motor.iq_ref = Math_PID_Calc(&g_motor.pid_spd, speed_target,
-                                               g_motor.obs.speed_rpm, 0.001f);
             }
 
-            // 高级算法：MTPA 与 弱磁计算
-            g_motor.id_mtpa_ref = CTRL_Calc_MTPA(g_motor.iq_ref);
-            g_motor.id_fw_ref = CTRL_Calc_FieldWeakening(
-                g_motor.v_d, g_motor.v_q, vbus,
-                g_motor.i_q, g_motor.iq_ref,
-                g_motor.id_fw_ref, 0.001f
-            );
+								// 高级算法：MTPA 与 弱磁计算
+								g_motor.id_mtpa_ref = CTRL_Calc_MTPA(g_motor.iq_ref);
+								g_motor.id_fw_ref = CTRL_Calc_FieldWeakening(g_motor.v_d, g_motor.v_q, vbus,
+									g_motor.i_q, g_motor.iq_ref,
+									g_motor.id_fw_ref, 0.001f);
         }
 
         // 5. VOFA+ 遥测数据打包与 DMA 发送

@@ -5,12 +5,13 @@ Motor_Ctrl_t g_motor;
 
 void APP_Init(void) {
     Ctrl_Observer_Init(&g_motor.obs);
-    Math_PID_Init(&g_motor.pid_spd, SPD_KP, SPD_KI, 0,
-                  MAX_IQ_CURRENT, MAX_IQ_CURRENT);
-    Math_PID_Init(&g_motor.pid_id,  CURRENT_KP, CURRENT_KI, 0, 1.0f, 1.0f);
-    Math_PID_Init(&g_motor.pid_iq,  CURRENT_KP, CURRENT_KI, 0, 1.0f, 1.0f);
-    g_motor.pid_spd.out_min = MIN_IQ_CURRENT;
-    g_motor.pid_spd.integral_min = MIN_IQ_CURRENT;
+   // 初始化速度环：最大 18A，最小 -10A
+    Speed_PI_Init(&g_motor.pi_speed, SPD_KP, SPD_KI, MAX_IQ_CURRENT, MIN_IQ_CURRENT);
+    
+    // 初始化电流环：输出的是目标电压 Vd, Vq。假设最大电压为 15V
+    Current_PI_Init(&g_motor.pi_id, CURRENT_KP, CURRENT_KI, 15.0f);
+    Current_PI_Init(&g_motor.pi_iq, CURRENT_KP, CURRENT_KI, 15.0f);
+   
     
     g_motor.state = STATE_IDLE;
     g_motor.target_rpm = 0.0f;

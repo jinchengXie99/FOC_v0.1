@@ -4,17 +4,17 @@
 /* ============================================================
  * 电机物理参数 (严禁在此处定义变量，只允许宏定义)
  * ============================================================ */
-#define MOTOR_POLE_PAIRS        7.0f        /* 极对数 */
-#define MOTOR_RS                0.0513f     /* 相电阻 (Ω) */
-#define MOTOR_LD                0.0000829f  /* D轴电感 (H) */
-#define MOTOR_LQ                0.0000829f  /* Q轴电感 (H) */
-#define MOTOR_LS                ((MOTOR_LD + MOTOR_LQ) * 0.5f) /* 观测器平均电感 */
+#define MOTOR_POLE_PAIRS        7.0f        			/* 极对数 */
+#define MOTOR_RS                0.3298f* 0.5f     /* 相电阻 (Ω) */
+#define MOTOR_LD                0.0000829f* 0.5f  	/* D轴电感 (H) */
+#define MOTOR_LQ                0.0000829f* 0.5f  	/* Q轴电感 (H) */
+#define MOTOR_LS                ((MOTOR_LD + MOTOR_LQ)* 0.5f ) /* 观测器平均电感 */
 //#define MOTOR_FLUX_LINKAGE      0.0027f     /* 永磁体磁链 (Wb) */
 /* ============================================================
- *  永磁体磁链自动计算 (基于实测反电动势)
+ *  永磁体磁链自动计算 (基于实测反电动势) 
  * ============================================================ */
-/* --- 反电动势实测数据 --- */
-#define MOTOR_VPP_LINE          11.98f      /* 线反电动势峰峰值 (V) */
+/* --- 反电动势实测数据 --- */  
+#define MOTOR_VPP_LINE          11.198f      /* 线反电动势峰峰值 (V) */
 #define MOTOR_F_E               203.73f     /* 反电动势测试频率 (Hz) */
 /* 磁链计算常数 推导过程： 1 / (4 * sqrt(3) * pi) = 4 * 1.7320508 * 3.14159265 = 21.765592
  * 1 / 21.765592 ≈ 0.04594407 */
@@ -26,18 +26,18 @@
 /* ============================================================
  * 控制环路参数
  * ============================================================ */
-#define CURRENT_BANDWIDTH       10000.0f    /* 电流环带宽 (rad/s) */
+#define CURRENT_BANDWIDTH       2000.0f    /* 电流环带宽 (rad/s) */
 #define CURRENT_KP              (MOTOR_LS * CURRENT_BANDWIDTH)
 #define CURRENT_KI              (MOTOR_RS * CURRENT_BANDWIDTH)
 
-#define SPD_KP                  0.0005f     /* 速度环 Kp (A/RPM) */
-#define SPD_KI                  0.01f       /* 速度环 Ki (A/(RPM*s)) */
-#define MAX_IQ_CURRENT          18.0f       /* 正向电流上限 (A) */
-#define MIN_IQ_CURRENT          -10.0f      /* 反向电流上限 (A) */
+#define SPD_KP                  0.00005f 	    /* 速度环 Kp (A/RPM) */
+#define SPD_KI                  0.0001f     /* 速度环 Ki (A/(RPM*s)) */
+#define MAX_IQ_CURRENT          5.0f       /* 正向电流上限 (A) */
+#define MIN_IQ_CURRENT          -5.0f      /* 反向电流上限 (A) */
 
-#define OBSERVER_GAIN           500.0f      /* VESC观测器增益 */
-#define PLL_KP                  50.0f       /* PLL 比例 */
-#define PLL_KI                  2000.0f     /* PLL 积分 */
+#define OBSERVER_GAIN           50.0f      /* VESC观测器增益 */
+#define PLL_KP                  30.0f       /* PLL 比例 */
+#define PLL_KI                  500.0f      /* PLL 积分 */
 
 #define IF_START_FREQ           20.0f       /* 强拖切入频率 (Hz) */
 #define IF_RAMP_RATE            15.0f       /* 强拖频率爬坡 (Hz/s) */

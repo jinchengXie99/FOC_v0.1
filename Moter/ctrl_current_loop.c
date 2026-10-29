@@ -1,5 +1,5 @@
 #include "ctrl_current_loop.h"
-#include "math_pid.h"
+#include "ctrl_pi.h"
 #include "math_svpwm.h"
 #include "hw_pwm.h"
 #include "hw_dsp.h"
@@ -30,17 +30,19 @@ void Ctrl_CurrentLoop_Execute(Motor_Ctrl_t *motor, float vbus, float dt) {
     motor->i_d = i_d_meas;
     motor->i_q = i_q_meas;
 
-    // 3. 目标电流融合 (MTPA 与 弱磁叠加，取绝对值大的)
+    // 3. 目标电流融合 (MTPA 与 弱磁叠加)
     float id_target = motor->id_mtpa_ref; 
     if (fabsf(motor->id_fw_ref) > fabsf(id_target)) {
         id_target = motor->id_fw_ref; 
     }
 
-    // 4. 电流 PI 输出单位为伏特，积分在矢量饱和时冻结。
+    // 4. 电流环误差计算
     float err_d = id_target - i_d_meas;
     float err_q = motor->iq_ref - i_q_meas;
-    float v_d_cmd = motor->pid_id.kp * err_d + motor->pid_id.integral;
-    float v_q_cmd = motor->pid_iq.kp * err_q + motor->pid_iq.integral;
+
+    // 5. 计算 PI 输出 (此时已包含积分和限幅)
+    float v_d_cmd = Current_PI_Calc(&motor->pi_id, id_target, i_d_meas, dt);
+    float v_q_cmd = Current_PI_Calc(&motor->pi_iq, motor->iq_ref, i_q_meas, dt);
 
     #if USE_DECOUPLING
         // 解耦补偿：Vd -= w * L * Iq, Vq += w * L * Id + w * Flux
@@ -49,7 +51,7 @@ void Ctrl_CurrentLoop_Execute(Motor_Ctrl_t *motor, float vbus, float dt) {
         v_q_cmd += motor->obs.omega_est * MOTOR_FLUX_LINKAGE; 
     #endif
 
-    // 5. 电压圆限幅与积分抗饱和。
+    // 6. 电压圆限幅
     float v_limit = vbus * 0.57735f; // 1/sqrt(3)
     float v_mag = HW_DSP_Sqrt(v_d_cmd * v_d_cmd + v_q_cmd * v_q_cmd);
     
@@ -57,13 +59,18 @@ void Ctrl_CurrentLoop_Execute(Motor_Ctrl_t *motor, float vbus, float dt) {
         float scale = v_limit / v_mag;
         v_d_cmd *= scale;
         v_q_cmd *= scale;
-    } else {
-        motor->pid_id.integral += motor->pid_id.ki * err_d * dt;
-        motor->pid_iq.integral += motor->pid_iq.ki * err_q * dt;
-        if (motor->pid_id.integral > v_limit) motor->pid_id.integral = v_limit;
-        if (motor->pid_id.integral < -v_limit) motor->pid_id.integral = -v_limit;
-        if (motor->pid_iq.integral > v_limit) motor->pid_iq.integral = v_limit;
-        if (motor->pid_iq.integral < -v_limit) motor->pid_iq.integral = -v_limit;
+        
+        // 如果电压达到极限，直接冻结积分器，防止 Windup
+        // 注意：这里的 integral 是微调，不要让函数内部积分导致输出饱和
+        // 由于我们在函数内部做了限幅，为了防止饱和，我们在这里将积分往回拉
+        motor->pi_id.integral = v_d_cmd - (motor->pi_id.kp * err_d);
+        motor->pi_iq.integral = v_q_cmd - (motor->pi_iq.kp * err_q);
+        
+        // 防止积分器越界
+        if (motor->pi_id.integral > v_limit) motor->pi_id.integral = v_limit;
+        if (motor->pi_id.integral < -v_limit) motor->pi_id.integral = -v_limit;
+        if (motor->pi_iq.integral > v_limit) motor->pi_iq.integral = v_limit;
+        if (motor->pi_iq.integral < -v_limit) motor->pi_iq.integral = -v_limit;
     }
 
     motor->v_d = v_d_cmd;

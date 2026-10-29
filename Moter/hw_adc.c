@@ -45,7 +45,7 @@ uint8_t HW_ADC_CalibrateInjected(uint16_t raw_ia, uint16_t raw_ic) {
  * 跳过 HAL 库的 HAL_ADCEx_InjectedGetValue() 函数，
  * 直接读寄存器 ADC2->JDRx，省去函数跳转开销。
  * ============================================================ */
-void HW_ADC_GetCurrents(float *ia, float *ib, float *ic) {
+void HW_ADC_GetCurrents(volatile float *ia, volatile float *ib, volatile float *ic) {
     // 1. 直接读取注入数据寄存器 (对应 CubeMX 中 Rank1 和 Rank2)
     // PA6 -> ADC2_IN3 -> Rank1 -> JDR1
     // PA4 -> ADC2_IN17 -> Rank2 -> JDR2

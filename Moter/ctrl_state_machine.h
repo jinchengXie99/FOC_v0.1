@@ -1,7 +1,7 @@
 #ifndef CTRL_STATE_MACHINE_H
 #define CTRL_STATE_MACHINE_H
 #include "ctrl_observer.h"
-#include "math_pid.h"
+#include "ctrl_pi.h"
 
 /* ============================================================
  * 电机主状态枚举
@@ -21,19 +21,19 @@ typedef enum {
 typedef struct {
     volatile MotorState_t state;
     Ctrl_Observer_t obs;    // 观测器句柄
-    Math_PID_t pid_spd;     // 速度环
-    Math_PID_t pid_id;      // D轴电流环
-    Math_PID_t pid_iq;      // Q轴电流环
+    Speed_PI_t   pi_speed;     // 速度环
+    Current_PI_t pi_id;      // D轴电流环
+    Current_PI_t pi_iq;      // Q轴电流环
 
     // 电流与电压反馈 (物理量 A / V)
-    float i_a, i_b, i_c;
-    float i_alpha, i_beta;
-    float i_d, i_q;
-    float v_d, v_q;
-    float v_alpha, v_beta;
+    volatile float i_a, i_b, i_c;
+    volatile float i_alpha, i_beta;
+    volatile float i_d, i_q;
+    volatile float v_d, v_q;
+    volatile float v_alpha, v_beta;
 
     // 参考值
-    float target_rpm;
+    volatile float target_rpm;
     volatile float iq_ref;
     volatile float id_mtpa_ref;
     volatile float id_fw_ref;
@@ -41,10 +41,10 @@ typedef struct {
     // IF 启动状态
     volatile float theta_if;
     volatile float freq_e;
-    volatile uint8_t run_timer;
+    volatile uint16_t run_timer;
 
     // 故障标志
-    uint8_t fault_code;
+    volatile uint8_t fault_code;
 } Motor_Ctrl_t;
 
 void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt);

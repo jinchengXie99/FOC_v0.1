@@ -27,7 +27,7 @@ uint8_t HW_ADC_CalibrateInjected(uint16_t raw_ia, uint16_t raw_ic);
  * 数据极速读取接口
  * ============================================================ */
 /* 读取三相物理电流 (A) - 耗时 < 1us */
-void HW_ADC_GetCurrents(float *ia, float *ib, float *ic);
+void HW_ADC_GetCurrents(volatile float *ia, volatile float *ib, volatile float *ic);
 
 /* 读取母线电压 (V) - 从 DMA 内存直接取 */
 float HW_ADC_GetVbus(void);

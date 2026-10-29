@@ -6,12 +6,12 @@
  * VESC 非线性磁链观测器句柄
  * ============================================================ */
 typedef struct {
-    float obs_x1;           // 内部磁链 alpha
-    float obs_x2;           // 内部磁链 beta
-    float pll_integral;     // PLL 积分器
-    float theta_est;        // 估计电角度
-    float omega_est;        // 估计电角速度 (rad/s)
-    float speed_rpm;        // 估计机械转速 (RPM)
+    volatile float obs_x1;       // 内部磁链 alpha
+    volatile float obs_x2;       // 内部磁链 beta
+    volatile float pll_integral; // PLL 积分器
+    volatile float theta_est;    // 估计电角度
+    volatile float omega_est;    // 估计电角速度 (rad/s)
+    volatile float speed_rpm;    // 估计机械转速 (RPM)
 } Ctrl_Observer_t;
 
 void Ctrl_Observer_Init(Ctrl_Observer_t *obs);
