@@ -315,7 +315,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
                 g_motor.pi_speed.integral = IF_START_IQ;
                 g_motor.iq_ref = IF_START_IQ;
             } else {
-                float speed_actual = g_motor.obs.speed_rpm;
+							
+                
+								// 使用 0.05f 的滤波系数，截止频率约 8Hz，能有效滤除高频毛刺
+								g_motor.obs.speed_rpm_filt = g_motor.obs.speed_rpm_filt * 0.99f + g_motor.obs.speed_rpm * 0.01f;
+							float speed_actual = g_motor.obs.speed_rpm_filt;
                 float speed_error = g_motor.target_rpm - speed_actual;
                 if (isnan(speed_actual) || isinf(speed_actual) ||
                     isnan(speed_error) || isinf(speed_error)) {
@@ -324,13 +328,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
                 } else {
                     if (fabsf(speed_error) < 10.0f) {
                         speed_error = 0.0f;
-                    } else if (speed_error > 1000.0f) {
-                        speed_error = 1000.0f;
-                    } else if (speed_error < -1000.0f) {
-                        speed_error = -1000.0f;
-                    }
+                    } 
+//										else if (speed_error > 1000.0f) {
+//                        speed_error = 1000.0f;
+//                    } else if (speed_error < -1000.0f) {
+//                        speed_error = -1000.0f;
+//                    }
 
-                    float speed_target = speed_actual + speed_error;
+                    float speed_target  = speed_actual + speed_error;
                     g_motor.iq_ref = Speed_PI_Calc(&g_motor.pi_speed,
                                                    speed_target,
                                                    speed_actual,

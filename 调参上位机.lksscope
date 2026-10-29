@@ -19,275 +19,269 @@
         <param name="checkAxf" value="1"/>
     </params>
     <layouts>
-        <param name="geometry" value="AdnQywADAAAAAAQBAAADAgAACGQAAAU+AAAEAgAAAyEAAAhjAAAFPQAAAAAAAAAACgAAAAQCAAADIQAACGMAAAU9"/>
-        <param name="state" value="AAAA/wAAAAD9AAAAAQAAAAEAAAAAAAAAAPwCAAAABPsAAAAMAFIAVABUVH1O5IhMAAAAAAD/////AAAAwAD////7AAAACgBSAFQAVGVwY24AAAAAAP////8AAAEPAP////sAAAAIdTVnOmOnUjYAAAAAAP////8AAACsAP////sAAAAIj9CITGXlX9cAAAAAAP////8AAABdAP///wAABGIAAAG0AAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAMAAAAOAHQAbwBvAGwAQgBhAHIBAAAAAP////8AAAAAAAAAAAAAABIAdABvAG8AbABCAGEAcgBfADIBAAAAxP////8AAAAAAAAAAAAAABYAdABvAG8AbABCAGEAcgBMAG8AZwBvAQAAAn//////AAAAAAAAAAA="/>
+        <param name="geometry" value="AdnQywADAAD/////////+AAACgAAAAVwAAAEAgAAAyEAAAhjAAAFPQAAAAACAAAACgAAAAAAAAAAFwAACf8AAAVv"/>
+        <param name="state" value="AAAA/wAAAAD9AAAAAQAAAAEAAAAAAAAAAPwCAAAABPsAAAAMAFIAVABUVH1O5IhMAAAAAAD/////AAAAwAD////7AAAACgBSAFQAVGVwY24AAAAAAP////8AAAEPAP////sAAAAIdTVnOmOnUjYAAAAAAP////8AAACsAP////sAAAAIj9CITGXlX9cAAAAAAP////8AAABdAP///wAACgAAAATwAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAMAAAAOAHQAbwBvAGwAQgBhAHIBAAAAAP////8AAAAAAAAAAAAAABIAdABvAG8AbABCAGEAcgBfADIBAAAAxP////8AAAAAAAAAAAAAABYAdABvAG8AbABCAGEAcgBMAG8AZwBvAQAAAn//////AAAAAAAAAAA="/>
     </layouts>
     <tabs curPage="0">
-        <tab checked="1" title="标签页0" geometry="AdnQywADAAAAAAAAAAAAAAAAAsMAAAGFAAAAAAAAAAD//////////wAAAAAAAAAACgAAAAAAAAAAAAAAAsMAAAGF" state="AAAA/wAAAAD9AAAAAQAAAAEAAALEAAABhvwCAAAAGPsAAAAMAFIAVABUVH1O5IhMAAAAAAD/////AAAAAAAAAAD7AAAACgBSAFQAVGVwY24AAAAAAP////8AAAAAAAAAAPsAAAAIdTVnOmOnUjYAAAAAAP////8AAAAAAAAAAPsAAAAIj9CITGXlX9cAAAAAAP////8AAAAAAAAAAPsAAAAOAEUAbgBjAG8AZABlAHIAAAAAAAAABoAAAABdAP////sAAAAKAE0AbwB0AG8AcgAAAAQjAAACXQAAAF0A////+wAAAAwAUwBhAG0AcABsAGUAAAACmgAAA+YAAABdAP////sAAAAGAEYAbwBjAAAABJEAAAHvAAAAXQD////7AAAACgBJAHEAUABpAGQAAAAAAAAABboAAABdAP////sAAAAMAFMAcABkAFAAaQBkAAAAAAAAAACoAAAAXQD////7AAAADABQAG8AcwBQAGkAZAAAAAAAAAAAvAAAAF0A////+wAAAAoAUwBwAGUAZQBkAAAAAAAAAAJBAAAAXQD////7AAAADgBUAEEAYwBjAEQAZQBjAAAAAAAAAAKuAAAAXQD////7AAAAEABQAG8AcwBpAHQAaQBvAG4AAAAAAAAAARoAAABdAP////sAAAAGAFMATQBPAAAAAAAAAAKVAAAAXQD////7AAAABgBIAEYASQAAAAAAAAAE9AAAAF0A////+wAAAAgAUwBQAEwATAEAAAAAAAABhgAAAF0A////+wAAAAgASQBhAGIAYwAAAAG5AAAAeQAAAEgA////+wAAAAYAQwBDAFIAAAAC7wAAAFIAAABIAP////sAAAAOAEUAbgBjAG8AZABlAHIAAAAEoAAAAm8AAABIAP////sAAAAIAGQAdQB0AHkAAAADFQAAAFYAAABIAP////sAAAAGAHMAaQBuAAAAA7QAAAE4AAAASAD////7AAAAFABzAHYAbQBfAHMAZQBjAHQAcAByAAAABHwAAAKTAAAASAD////7AAAACgBkAHUAdAB5AHYAAAACBgAABQkAAABIAP///wAAAAAAAAGCAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAA="/>
+        <tab title="标签页0" checked="1" state="AAAA/wAAAAD9AAAAAQAAAAEAAAdpAAAEwvwCAAAAGfsAAAAMAFIAVABUVH1O5IhMAAAAAAD/////AAAAAAAAAAD7AAAACgBSAFQAVGVwY24AAAAAAP////8AAAAAAAAAAPsAAAAIdTVnOmOnUjYAAAAAAP////8AAAAAAAAAAPsAAAAIj9CITGXlX9cAAAAAAP////8AAAAAAAAAAPsAAAAOAEUAbgBjAG8AZABlAHIAAAAAAAAABoAAAABdAP////sAAAAKAE0AbwB0AG8AcgAAAAQjAAACXQAAAF0A////+wAAAAwAUwBhAG0AcABsAGUAAAACmgAAA+YAAABdAP////sAAAAGAEYAbwBjAAAABJEAAAHvAAAAXQD////7AAAACgBJAHEAUABpAGQAAAAAAAAABboAAABdAP////sAAAAMAFMAcABkAFAAaQBkAAAAAAAAAACoAAAAXQD////7AAAADABQAG8AcwBQAGkAZAAAAAAAAAAAvAAAAF0A////+wAAAAoAUwBwAGUAZQBkAAAAAAAAAAJBAAAAXQD////7AAAADgBUAEEAYwBjAEQAZQBjAAAAAAAAAAKuAAAAXQD////7AAAAEABQAG8AcwBpAHQAaQBvAG4AAAAAAAAAARoAAABdAP////sAAAAGAFMATQBPAAAAAAAAAAKVAAAAXQD////7AAAABgBIAEYASQAAAAAAAAAE9AAAAF0A////+wAAAAgAUwBQAEwATAEAAAAAAAACsQAAAF0A////+wAAAAgASQBhAGIAYwAAAAG5AAAAeQAAAEgA////+wAAAAYAQwBDAFIAAAAC7wAAAFIAAABIAP////sAAAAOAEUAbgBjAG8AZABlAHIAAAAEoAAAAm8AAABIAP////sAAAAIAGQAdQB0AHkAAAADFQAAAFYAAABIAP////sAAAAGAHMAaQBuAAAAA7QAAAE4AAAASAD////7AAAAFABzAHYAbQBfAHMAZQBjAHQAcAByAAAABHwAAAKTAAAASAD////7AAAACgBkAHUAdAB5AHYAAAACBgAABQkAAABIAP////sAAAAGZvJ+vwA3AQAAArUAAAINAAAASAD///8AAAAAAAAEwgAAAAQAAAAEAAAACAAAAAj8AAAAAQAAAAIAAAAA" geometry="AdnQywADAAAAAAAAAAAAAAAAB2gAAATBAAAAAAAAAAD//////////wAAAAAAAAAACgAAAAAAAAAAAAAAB2gAAATB"/>
     </tabs>
     <forms>
-        <form type="0" title="Form"/>
-        <form type="1" title="自定义变量" lv-width="150,100,100,100,100,100,100,100,100,100"/>
-        <form type="13" title="寄存器变量" chip="" lv-width="150,100,100,100,100,100,100,100,100,100"/>
-        <form type="2" mapFile="./MDK-ARM/FOC_v0.1/FOC_v0_1.axf" title="代码变量" lv-width="321,100,100,100,100,100,100,100,100,100"/>
-        <form floating="0" page="-1" visible="0" type="3" title="运行日志"/>
-        <form floating="0" sync2File="0" page="-1" visible="0" type="4" syncFilePath="" title="RTT命令行" checkTStamp="0" encode="GBK"/>
-        <form floating="0" subMode="0" page="-1" visible="0" type="5" xCount="1000" scatterStyle="1" trigValue="0" autoRange="1" trigType="0" title="RTT数据" min="-500" lineStyle="1" max="500" trigName="" xTag="0" scrollType="0"/>
-        <form floating="0" page="-1" visible="0" type="12" title="电机控制" lv-width="150,100,100,100,100">
-            <var name="" lower="0" upper="100" step="1" desc="速度设定"/>
-            <var name="" lower="0" upper="100" step="1" desc="电流设定"/>
-            <var name="" lower="0" upper="100" step="1" desc="功率设定"/>
-            <var name="" lower="0" upper="1" step="1" desc="电机启停"/>
+        <form title="Form" type="0"/>
+        <form title="自定义变量" lv-width="150,100,100,100,100,100,100,100,100,100" type="1"/>
+        <form title="寄存器变量" chip="" lv-width="150,100,100,100,100,100,100,100,100,100" type="13"/>
+        <form title="代码变量" lv-width="321,100,100,100,100,100,100,100,100,100" mapFile="./MDK-ARM/FOC_v0.1/FOC_v0_1.axf" type="2"/>
+        <form title="运行日志" page="-1" floating="0" visible="0" type="3"/>
+        <form title="RTT命令行" page="-1" syncFilePath="" floating="0" encode="GBK" visible="0" checkTStamp="0" sync2File="0" type="4"/>
+        <form title="RTT数据" page="-1" scatterStyle="1" trigName="" floating="0" scrollType="0" max="500" autoRange="1" trigType="0" visible="0" xTag="0" lineStyle="1" trigValue="0" xCount="1000" min="-500" type="5" subMode="0"/>
+        <form title="电机控制" page="-1" floating="0" lv-width="150,100,100,100,100" visible="0" type="12">
+            <var name="" lower="0" upper="100" desc="速度设定" step="1"/>
+            <var name="" lower="0" upper="100" desc="电流设定" step="1"/>
+            <var name="" lower="0" upper="100" desc="功率设定" step="1"/>
+            <var name="" lower="0" upper="1" desc="电机启停" step="1"/>
         </form>
-        <form floating="0" page="-1" visible="0" type="6" title="Form"/>
-        <form floating="0" page="0" visible="0" type="7" title="Encoder" lv-hidden="" lv-width="303,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.Encoder.Dir" unit="" formula="" addr="" desc="MC.Encoder.Dir" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Encoder.Type" unit="" formula="" addr="" desc="MC.Encoder.Type" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Encoder.PolePairs" unit="" formula="" addr="" desc="MC.Encoder.PolePairs" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Encoder.EncoderVal" unit="" formula="" addr="" desc="MC.Encoder.EncoderVal" interval="1" showType="Signed" color=""/>
-            <var name="MC.Encoder.EncoderValMax" unit="" formula="" addr="" desc="MC.Encoder.EncoderValMax" interval="1" showType="Signed" color=""/>
-            <var name="MC.Encoder.ElectricalVal" unit="" formula="" addr="" desc="MC.Encoder.ElectricalVal" interval="1" showType="Signed" color=""/>
-            <var name="MC.Encoder.CalibFlag" unit="" formula="" addr="" desc="MC.Encoder.CalibFlag" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Encoder.CalibOffset" unit="" formula="" addr="" desc="MC.Encoder.CalibOffset" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Encoder.ElectricalSpdSet" unit="" formula="" addr="" desc="MC.Encoder.ElectricalSpdSet" interval="1" showType="Real" color=""/>
-            <var name="MC.Encoder.ElectricalValSet" unit="" formula="" addr="" desc="MC.Encoder.ElectricalValSet" interval="1" showType="Real" color=""/>
+        <form title="Form" page="-1" floating="0" visible="0" type="6"/>
+        <form title="Encoder" page="0" floating="0" lv-width="303,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.Encoder.Dir" showType="Unsigned" interval="1" formula="" desc="MC.Encoder.Dir" addr=""/>
+            <var unit="" color="" name="MC.Encoder.Type" showType="Unsigned" interval="1" formula="" desc="MC.Encoder.Type" addr=""/>
+            <var unit="" color="" name="MC.Encoder.PolePairs" showType="Unsigned" interval="1" formula="" desc="MC.Encoder.PolePairs" addr=""/>
+            <var unit="" color="" name="MC.Encoder.EncoderVal" showType="Signed" interval="1" formula="" desc="MC.Encoder.EncoderVal" addr=""/>
+            <var unit="" color="" name="MC.Encoder.EncoderValMax" showType="Signed" interval="1" formula="" desc="MC.Encoder.EncoderValMax" addr=""/>
+            <var unit="" color="" name="MC.Encoder.ElectricalVal" showType="Signed" interval="1" formula="" desc="MC.Encoder.ElectricalVal" addr=""/>
+            <var unit="" color="" name="MC.Encoder.CalibFlag" showType="Unsigned" interval="1" formula="" desc="MC.Encoder.CalibFlag" addr=""/>
+            <var unit="" color="" name="MC.Encoder.CalibOffset" showType="Unsigned" interval="1" formula="" desc="MC.Encoder.CalibOffset" addr=""/>
+            <var unit="" color="" name="MC.Encoder.ElectricalSpdSet" showType="Real" interval="1" formula="" desc="MC.Encoder.ElectricalSpdSet" addr=""/>
+            <var unit="" color="" name="MC.Encoder.ElectricalValSet" showType="Real" interval="1" formula="" desc="MC.Encoder.ElectricalValSet" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="Motor" lv-hidden="" lv-width="220,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.Motor.RunState" unit="" formula="" addr="" desc="MC.Motor.RunState" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Motor.RunMode" unit="" formula="" addr="" desc="MC.Motor.RunMode" interval="1" showType="Unsigned" color=""/>
+        <form title="Motor" page="0" floating="0" lv-width="220,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.Motor.RunState" showType="Unsigned" interval="1" formula="" desc="MC.Motor.RunState" addr=""/>
+            <var unit="" color="" name="MC.Motor.RunMode" showType="Unsigned" interval="1" formula="" desc="MC.Motor.RunMode" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="Sample" lv-hidden="" lv-width="357,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.Sample.CurrentDir" unit="" formula="" addr="" desc="MC.Sample.CurrentDir" interval="1" showType="Signed" color=""/>
-            <var name="MC.Sample.EndFlag" unit="" formula="" addr="" desc="MC.Sample.EndFlag" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Sample.OffsetCnt" unit="" formula="" addr="" desc="MC.Sample.OffsetCnt" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Sample.BusOffset" unit="" formula="" addr="" desc="MC.Sample.BusOffset" interval="1" showType="Signed" color=""/>
-            <var name="MC.Sample.IuOffset" unit="" formula="" addr="" desc="MC.Sample.IuOffset" interval="1" showType="Signed" color=""/>
-            <var name="MC.Sample.IvOffset" unit="" formula="" addr="" desc="MC.Sample.IvOffset" interval="1" showType="Signed" color=""/>
-            <var name="MC.Sample.IwOffset" unit="" formula="" addr="" desc="MC.Sample.IwOffset" interval="1" showType="Signed" color=""/>
-            <var name="MC.Sample.BusRaw" unit="" formula="" addr="" desc="MC.Sample.BusRaw" interval="1" showType="Signed" color=""/>
-            <var name="MC.Sample.IuRaw" unit="" formula="" addr="" desc="MC.Sample.IuRaw" interval="1" showType="Signed" color=""/>
-            <var name="MC.Sample.IvRaw" unit="" formula="" addr="" desc="MC.Sample.IvRaw" interval="1" showType="Signed" color=""/>
-            <var name="MC.Sample.IwRaw" unit="" formula="" addr="" desc="MC.Sample.IwRaw" interval="1" showType="Signed" color=""/>
-            <var name="MC.Sample.IuReal" unit="" formula="" addr="" desc="MC.Sample.IuReal" interval="1" showType="Real" color=""/>
-            <var name="MC.Sample.IvReal" unit="" formula="" addr="" desc="MC.Sample.IvReal" interval="1" showType="Real" color=""/>
-            <var name="MC.Sample.IwReal" unit="" formula="" addr="" desc="MC.Sample.IwReal" interval="1" showType="Real" color=""/>
-            <var name="MC.Sample.BusReal" unit="" formula="" addr="" desc="MC.Sample.BusReal" interval="1" showType="Real" color=""/>
-            <var name="MC.Sample.BusCalibReal" unit="" formula="" addr="" desc="MC.Sample.BusCalibReal" interval="1" showType="Real" color=""/>
-            <var name="MC.Sample.BusChange" unit="" formula="" addr="" desc="MC.Sample.BusChange" interval="1" showType="Real" color=""/>
-            <var name="MC.Sample.BusFactor" unit="" formula="" addr="" desc="MC.Sample.BusFactor" interval="1" showType="Real" color=""/>
-            <var name="MC.Sample.CurrentFactor" unit="" formula="" addr="" desc="MC.Sample.CurrentFactor" interval="1" showType="Real" color=""/>
+        <form title="Sample" page="0" floating="0" lv-width="357,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.Sample.CurrentDir" showType="Signed" interval="1" formula="" desc="MC.Sample.CurrentDir" addr=""/>
+            <var unit="" color="" name="MC.Sample.EndFlag" showType="Unsigned" interval="1" formula="" desc="MC.Sample.EndFlag" addr=""/>
+            <var unit="" color="" name="MC.Sample.OffsetCnt" showType="Unsigned" interval="1" formula="" desc="MC.Sample.OffsetCnt" addr=""/>
+            <var unit="" color="" name="MC.Sample.BusOffset" showType="Signed" interval="1" formula="" desc="MC.Sample.BusOffset" addr=""/>
+            <var unit="" color="" name="MC.Sample.IuOffset" showType="Signed" interval="1" formula="" desc="MC.Sample.IuOffset" addr=""/>
+            <var unit="" color="" name="MC.Sample.IvOffset" showType="Signed" interval="1" formula="" desc="MC.Sample.IvOffset" addr=""/>
+            <var unit="" color="" name="MC.Sample.IwOffset" showType="Signed" interval="1" formula="" desc="MC.Sample.IwOffset" addr=""/>
+            <var unit="" color="" name="MC.Sample.BusRaw" showType="Signed" interval="1" formula="" desc="MC.Sample.BusRaw" addr=""/>
+            <var unit="" color="" name="MC.Sample.IuRaw" showType="Signed" interval="1" formula="" desc="MC.Sample.IuRaw" addr=""/>
+            <var unit="" color="" name="MC.Sample.IvRaw" showType="Signed" interval="1" formula="" desc="MC.Sample.IvRaw" addr=""/>
+            <var unit="" color="" name="MC.Sample.IwRaw" showType="Signed" interval="1" formula="" desc="MC.Sample.IwRaw" addr=""/>
+            <var unit="" color="" name="MC.Sample.IuReal" showType="Real" interval="1" formula="" desc="MC.Sample.IuReal" addr=""/>
+            <var unit="" color="" name="MC.Sample.IvReal" showType="Real" interval="1" formula="" desc="MC.Sample.IvReal" addr=""/>
+            <var unit="" color="" name="MC.Sample.IwReal" showType="Real" interval="1" formula="" desc="MC.Sample.IwReal" addr=""/>
+            <var unit="" color="" name="MC.Sample.BusReal" showType="Real" interval="1" formula="" desc="MC.Sample.BusReal" addr=""/>
+            <var unit="" color="" name="MC.Sample.BusCalibReal" showType="Real" interval="1" formula="" desc="MC.Sample.BusCalibReal" addr=""/>
+            <var unit="" color="" name="MC.Sample.BusChange" showType="Real" interval="1" formula="" desc="MC.Sample.BusChange" addr=""/>
+            <var unit="" color="" name="MC.Sample.BusFactor" showType="Real" interval="1" formula="" desc="MC.Sample.BusFactor" addr=""/>
+            <var unit="" color="" name="MC.Sample.CurrentFactor" showType="Real" interval="1" formula="" desc="MC.Sample.CurrentFactor" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="Foc" lv-hidden="" lv-width="210,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.Foc.Iu" unit="" formula="" addr="" desc="MC.Foc.Iu" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Iv" unit="" formula="" addr="" desc="MC.Foc.Iv" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Iw" unit="" formula="" addr="" desc="MC.Foc.Iw" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Ialpha" unit="" formula="" addr="" desc="MC.Foc.Ialpha" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Ibeta" unit="" formula="" addr="" desc="MC.Foc.Ibeta" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.SinVal" unit="" formula="" addr="" desc="MC.Foc.SinVal" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.CosVal" unit="" formula="" addr="" desc="MC.Foc.CosVal" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Id" unit="" formula="" addr="" desc="MC.Foc.Id" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Iq" unit="" formula="" addr="" desc="MC.Foc.Iq" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.IdLPF" unit="" formula="" addr="" desc="MC.Foc.IdLPF" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.IqLPF" unit="" formula="" addr="" desc="MC.Foc.IqLPF" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.IdLPFFactor" unit="" formula="" addr="" desc="MC.Foc.IdLPFFactor" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.IqLPFFactor" unit="" formula="" addr="" desc="MC.Foc.IqLPFFactor" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Ud" unit="" formula="" addr="" desc="MC.Foc.Ud" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Uq" unit="" formula="" addr="" desc="MC.Foc.Uq" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Ualpha" unit="" formula="" addr="" desc="MC.Foc.Ualpha" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Ubeta" unit="" formula="" addr="" desc="MC.Foc.Ubeta" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.Ubus" unit="" formula="" addr="" desc="MC.Foc.Ubus" interval="1" showType="Real" color=""/>
-            <var name="MC.Foc.PwmCycle" unit="" formula="" addr="" desc="MC.Foc.PwmCycle" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Foc.PwmLimit" unit="" formula="" addr="" desc="MC.Foc.PwmLimit" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Foc.DutyCycleA" unit="" formula="" addr="" desc="MC.Foc.DutyCycleA" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Foc.DutyCycleB" unit="" formula="" addr="" desc="MC.Foc.DutyCycleB" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Foc.DutyCycleC" unit="" formula="" addr="" desc="MC.Foc.DutyCycleC" interval="1" showType="Unsigned" color=""/>
+        <form title="Foc" page="0" floating="0" lv-width="210,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.Foc.Iu" showType="Real" interval="1" formula="" desc="MC.Foc.Iu" addr=""/>
+            <var unit="" color="" name="MC.Foc.Iv" showType="Real" interval="1" formula="" desc="MC.Foc.Iv" addr=""/>
+            <var unit="" color="" name="MC.Foc.Iw" showType="Real" interval="1" formula="" desc="MC.Foc.Iw" addr=""/>
+            <var unit="" color="" name="MC.Foc.Ialpha" showType="Real" interval="1" formula="" desc="MC.Foc.Ialpha" addr=""/>
+            <var unit="" color="" name="MC.Foc.Ibeta" showType="Real" interval="1" formula="" desc="MC.Foc.Ibeta" addr=""/>
+            <var unit="" color="" name="MC.Foc.SinVal" showType="Real" interval="1" formula="" desc="MC.Foc.SinVal" addr=""/>
+            <var unit="" color="" name="MC.Foc.CosVal" showType="Real" interval="1" formula="" desc="MC.Foc.CosVal" addr=""/>
+            <var unit="" color="" name="MC.Foc.Id" showType="Real" interval="1" formula="" desc="MC.Foc.Id" addr=""/>
+            <var unit="" color="" name="MC.Foc.Iq" showType="Real" interval="1" formula="" desc="MC.Foc.Iq" addr=""/>
+            <var unit="" color="" name="MC.Foc.IdLPF" showType="Real" interval="1" formula="" desc="MC.Foc.IdLPF" addr=""/>
+            <var unit="" color="" name="MC.Foc.IqLPF" showType="Real" interval="1" formula="" desc="MC.Foc.IqLPF" addr=""/>
+            <var unit="" color="" name="MC.Foc.IdLPFFactor" showType="Real" interval="1" formula="" desc="MC.Foc.IdLPFFactor" addr=""/>
+            <var unit="" color="" name="MC.Foc.IqLPFFactor" showType="Real" interval="1" formula="" desc="MC.Foc.IqLPFFactor" addr=""/>
+            <var unit="" color="" name="MC.Foc.Ud" showType="Real" interval="1" formula="" desc="MC.Foc.Ud" addr=""/>
+            <var unit="" color="" name="MC.Foc.Uq" showType="Real" interval="1" formula="" desc="MC.Foc.Uq" addr=""/>
+            <var unit="" color="" name="MC.Foc.Ualpha" showType="Real" interval="1" formula="" desc="MC.Foc.Ualpha" addr=""/>
+            <var unit="" color="" name="MC.Foc.Ubeta" showType="Real" interval="1" formula="" desc="MC.Foc.Ubeta" addr=""/>
+            <var unit="" color="" name="MC.Foc.Ubus" showType="Real" interval="1" formula="" desc="MC.Foc.Ubus" addr=""/>
+            <var unit="" color="" name="MC.Foc.PwmCycle" showType="Unsigned" interval="1" formula="" desc="MC.Foc.PwmCycle" addr=""/>
+            <var unit="" color="" name="MC.Foc.PwmLimit" showType="Unsigned" interval="1" formula="" desc="MC.Foc.PwmLimit" addr=""/>
+            <var unit="" color="" name="MC.Foc.DutyCycleA" showType="Unsigned" interval="1" formula="" desc="MC.Foc.DutyCycleA" addr=""/>
+            <var unit="" color="" name="MC.Foc.DutyCycleB" showType="Unsigned" interval="1" formula="" desc="MC.Foc.DutyCycleB" addr=""/>
+            <var unit="" color="" name="MC.Foc.DutyCycleC" showType="Unsigned" interval="1" formula="" desc="MC.Foc.DutyCycleC" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="IqPid" lv-hidden="" lv-width="201,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.IqPid.Kp" unit="" formula="" addr="" desc="MC.IqPid.Kp" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.Ki" unit="" formula="" addr="" desc="MC.IqPid.Ki" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.Kd" unit="" formula="" addr="" desc="MC.IqPid.Kd" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.Ref" unit="" formula="" addr="" desc="MC.IqPid.Ref" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.Fbk" unit="" formula="" addr="" desc="MC.IqPid.Fbk" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.Out" unit="" formula="" addr="" desc="MC.IqPid.Out" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.Err" unit="" formula="" addr="" desc="MC.IqPid.Err" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.ErrLast" unit="" formula="" addr="" desc="MC.IqPid.ErrLast" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.AllowErr" unit="" formula="" addr="" desc="MC.IqPid.AllowErr" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.Integrate" unit="" formula="" addr="" desc="MC.IqPid.Integrate" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.OutMax" unit="" formula="" addr="" desc="MC.IqPid.OutMax" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.OutMin" unit="" formula="" addr="" desc="MC.IqPid.OutMin" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.KpMax" unit="" formula="" addr="" desc="MC.IqPid.KpMax" interval="1" showType="Real" color=""/>
-            <var name="MC.IqPid.KpMin" unit="" formula="" addr="" desc="MC.IqPid.KpMin" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.Kp" unit="" formula="" addr="" desc="MC.IdPid.Kp" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.Ki" unit="" formula="" addr="" desc="MC.IdPid.Ki" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.Kd" unit="" formula="" addr="" desc="MC.IdPid.Kd" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.Ref" unit="" formula="" addr="" desc="MC.IdPid.Ref" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.Fbk" unit="" formula="" addr="" desc="MC.IdPid.Fbk" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.Out" unit="" formula="" addr="" desc="MC.IdPid.Out" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.Err" unit="" formula="" addr="" desc="MC.IdPid.Err" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.ErrLast" unit="" formula="" addr="" desc="MC.IdPid.ErrLast" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.AllowErr" unit="" formula="" addr="" desc="MC.IdPid.AllowErr" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.Integrate" unit="" formula="" addr="" desc="MC.IdPid.Integrate" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.OutMax" unit="" formula="" addr="" desc="MC.IdPid.OutMax" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.OutMin" unit="" formula="" addr="" desc="MC.IdPid.OutMin" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.KpMax" unit="" formula="" addr="" desc="MC.IdPid.KpMax" interval="1" showType="Real" color=""/>
-            <var name="MC.IdPid.KpMin" unit="" formula="" addr="" desc="MC.IdPid.KpMin" interval="1" showType="Real" color=""/>
+        <form title="IqPid" page="0" floating="0" lv-width="201,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.IqPid.Kp" showType="Real" interval="1" formula="" desc="MC.IqPid.Kp" addr=""/>
+            <var unit="" color="" name="MC.IqPid.Ki" showType="Real" interval="1" formula="" desc="MC.IqPid.Ki" addr=""/>
+            <var unit="" color="" name="MC.IqPid.Kd" showType="Real" interval="1" formula="" desc="MC.IqPid.Kd" addr=""/>
+            <var unit="" color="" name="MC.IqPid.Ref" showType="Real" interval="1" formula="" desc="MC.IqPid.Ref" addr=""/>
+            <var unit="" color="" name="MC.IqPid.Fbk" showType="Real" interval="1" formula="" desc="MC.IqPid.Fbk" addr=""/>
+            <var unit="" color="" name="MC.IqPid.Out" showType="Real" interval="1" formula="" desc="MC.IqPid.Out" addr=""/>
+            <var unit="" color="" name="MC.IqPid.Err" showType="Real" interval="1" formula="" desc="MC.IqPid.Err" addr=""/>
+            <var unit="" color="" name="MC.IqPid.ErrLast" showType="Real" interval="1" formula="" desc="MC.IqPid.ErrLast" addr=""/>
+            <var unit="" color="" name="MC.IqPid.AllowErr" showType="Real" interval="1" formula="" desc="MC.IqPid.AllowErr" addr=""/>
+            <var unit="" color="" name="MC.IqPid.Integrate" showType="Real" interval="1" formula="" desc="MC.IqPid.Integrate" addr=""/>
+            <var unit="" color="" name="MC.IqPid.OutMax" showType="Real" interval="1" formula="" desc="MC.IqPid.OutMax" addr=""/>
+            <var unit="" color="" name="MC.IqPid.OutMin" showType="Real" interval="1" formula="" desc="MC.IqPid.OutMin" addr=""/>
+            <var unit="" color="" name="MC.IqPid.KpMax" showType="Real" interval="1" formula="" desc="MC.IqPid.KpMax" addr=""/>
+            <var unit="" color="" name="MC.IqPid.KpMin" showType="Real" interval="1" formula="" desc="MC.IqPid.KpMin" addr=""/>
+            <var unit="" color="" name="MC.IdPid.Kp" showType="Real" interval="1" formula="" desc="MC.IdPid.Kp" addr=""/>
+            <var unit="" color="" name="MC.IdPid.Ki" showType="Real" interval="1" formula="" desc="MC.IdPid.Ki" addr=""/>
+            <var unit="" color="" name="MC.IdPid.Kd" showType="Real" interval="1" formula="" desc="MC.IdPid.Kd" addr=""/>
+            <var unit="" color="" name="MC.IdPid.Ref" showType="Real" interval="1" formula="" desc="MC.IdPid.Ref" addr=""/>
+            <var unit="" color="" name="MC.IdPid.Fbk" showType="Real" interval="1" formula="" desc="MC.IdPid.Fbk" addr=""/>
+            <var unit="" color="" name="MC.IdPid.Out" showType="Real" interval="1" formula="" desc="MC.IdPid.Out" addr=""/>
+            <var unit="" color="" name="MC.IdPid.Err" showType="Real" interval="1" formula="" desc="MC.IdPid.Err" addr=""/>
+            <var unit="" color="" name="MC.IdPid.ErrLast" showType="Real" interval="1" formula="" desc="MC.IdPid.ErrLast" addr=""/>
+            <var unit="" color="" name="MC.IdPid.AllowErr" showType="Real" interval="1" formula="" desc="MC.IdPid.AllowErr" addr=""/>
+            <var unit="" color="" name="MC.IdPid.Integrate" showType="Real" interval="1" formula="" desc="MC.IdPid.Integrate" addr=""/>
+            <var unit="" color="" name="MC.IdPid.OutMax" showType="Real" interval="1" formula="" desc="MC.IdPid.OutMax" addr=""/>
+            <var unit="" color="" name="MC.IdPid.OutMin" showType="Real" interval="1" formula="" desc="MC.IdPid.OutMin" addr=""/>
+            <var unit="" color="" name="MC.IdPid.KpMax" showType="Real" interval="1" formula="" desc="MC.IdPid.KpMax" addr=""/>
+            <var unit="" color="" name="MC.IdPid.KpMin" showType="Real" interval="1" formula="" desc="MC.IdPid.KpMin" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="SpdPid" lv-hidden="" lv-width="150,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.SpdPid.Kp" unit="" formula="" addr="" desc="MC.SpdPid.Kp" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.Ki" unit="" formula="" addr="" desc="MC.SpdPid.Ki" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.Kd" unit="" formula="" addr="" desc="MC.SpdPid.Kd" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.Ref" unit="" formula="" addr="" desc="MC.SpdPid.Ref" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.Fbk" unit="" formula="" addr="" desc="MC.SpdPid.Fbk" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.Out" unit="" formula="" addr="" desc="MC.SpdPid.Out" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.Err" unit="" formula="" addr="" desc="MC.SpdPid.Err" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.ErrLast" unit="" formula="" addr="" desc="MC.SpdPid.ErrLast" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.AllowErr" unit="" formula="" addr="" desc="MC.SpdPid.AllowErr" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.Integrate" unit="" formula="" addr="" desc="MC.SpdPid.Integrate" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.OutMax" unit="" formula="" addr="" desc="MC.SpdPid.OutMax" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.OutMin" unit="" formula="" addr="" desc="MC.SpdPid.OutMin" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.KpMax" unit="" formula="" addr="" desc="MC.SpdPid.KpMax" interval="1" showType="Real" color=""/>
-            <var name="MC.SpdPid.KpMin" unit="" formula="" addr="" desc="MC.SpdPid.KpMin" interval="1" showType="Real" color=""/>
+        <form title="SpdPid" page="0" floating="0" lv-width="150,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.SpdPid.Kp" showType="Real" interval="1" formula="" desc="MC.SpdPid.Kp" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.Ki" showType="Real" interval="1" formula="" desc="MC.SpdPid.Ki" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.Kd" showType="Real" interval="1" formula="" desc="MC.SpdPid.Kd" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.Ref" showType="Real" interval="1" formula="" desc="MC.SpdPid.Ref" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.Fbk" showType="Real" interval="1" formula="" desc="MC.SpdPid.Fbk" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.Out" showType="Real" interval="1" formula="" desc="MC.SpdPid.Out" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.Err" showType="Real" interval="1" formula="" desc="MC.SpdPid.Err" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.ErrLast" showType="Real" interval="1" formula="" desc="MC.SpdPid.ErrLast" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.AllowErr" showType="Real" interval="1" formula="" desc="MC.SpdPid.AllowErr" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.Integrate" showType="Real" interval="1" formula="" desc="MC.SpdPid.Integrate" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.OutMax" showType="Real" interval="1" formula="" desc="MC.SpdPid.OutMax" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.OutMin" showType="Real" interval="1" formula="" desc="MC.SpdPid.OutMin" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.KpMax" showType="Real" interval="1" formula="" desc="MC.SpdPid.KpMax" addr=""/>
+            <var unit="" color="" name="MC.SpdPid.KpMin" showType="Real" interval="1" formula="" desc="MC.SpdPid.KpMin" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="PosPid" lv-hidden="" lv-width="150,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.PosPid.Kp" unit="" formula="" addr="" desc="MC.PosPid.Kp" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.Ki" unit="" formula="" addr="" desc="MC.PosPid.Ki" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.Kd" unit="" formula="" addr="" desc="MC.PosPid.Kd" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.Ref" unit="" formula="" addr="" desc="MC.PosPid.Ref" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.Fbk" unit="" formula="" addr="" desc="MC.PosPid.Fbk" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.Out" unit="" formula="" addr="" desc="MC.PosPid.Out" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.Err" unit="" formula="" addr="" desc="MC.PosPid.Err" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.ErrLast" unit="" formula="" addr="" desc="MC.PosPid.ErrLast" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.AllowErr" unit="" formula="" addr="" desc="MC.PosPid.AllowErr" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.Integrate" unit="" formula="" addr="" desc="MC.PosPid.Integrate" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.OutMax" unit="" formula="" addr="" desc="MC.PosPid.OutMax" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.OutMin" unit="" formula="" addr="" desc="MC.PosPid.OutMin" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.KpMax" unit="" formula="" addr="" desc="MC.PosPid.KpMax" interval="1" showType="Real" color=""/>
-            <var name="MC.PosPid.KpMin" unit="" formula="" addr="" desc="MC.PosPid.KpMin" interval="1" showType="Real" color=""/>
+        <form title="PosPid" page="0" floating="0" lv-width="150,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.PosPid.Kp" showType="Real" interval="1" formula="" desc="MC.PosPid.Kp" addr=""/>
+            <var unit="" color="" name="MC.PosPid.Ki" showType="Real" interval="1" formula="" desc="MC.PosPid.Ki" addr=""/>
+            <var unit="" color="" name="MC.PosPid.Kd" showType="Real" interval="1" formula="" desc="MC.PosPid.Kd" addr=""/>
+            <var unit="" color="" name="MC.PosPid.Ref" showType="Real" interval="1" formula="" desc="MC.PosPid.Ref" addr=""/>
+            <var unit="" color="" name="MC.PosPid.Fbk" showType="Real" interval="1" formula="" desc="MC.PosPid.Fbk" addr=""/>
+            <var unit="" color="" name="MC.PosPid.Out" showType="Real" interval="1" formula="" desc="MC.PosPid.Out" addr=""/>
+            <var unit="" color="" name="MC.PosPid.Err" showType="Real" interval="1" formula="" desc="MC.PosPid.Err" addr=""/>
+            <var unit="" color="" name="MC.PosPid.ErrLast" showType="Real" interval="1" formula="" desc="MC.PosPid.ErrLast" addr=""/>
+            <var unit="" color="" name="MC.PosPid.AllowErr" showType="Real" interval="1" formula="" desc="MC.PosPid.AllowErr" addr=""/>
+            <var unit="" color="" name="MC.PosPid.Integrate" showType="Real" interval="1" formula="" desc="MC.PosPid.Integrate" addr=""/>
+            <var unit="" color="" name="MC.PosPid.OutMax" showType="Real" interval="1" formula="" desc="MC.PosPid.OutMax" addr=""/>
+            <var unit="" color="" name="MC.PosPid.OutMin" showType="Real" interval="1" formula="" desc="MC.PosPid.OutMin" addr=""/>
+            <var unit="" color="" name="MC.PosPid.KpMax" showType="Real" interval="1" formula="" desc="MC.PosPid.KpMax" addr=""/>
+            <var unit="" color="" name="MC.PosPid.KpMin" showType="Real" interval="1" formula="" desc="MC.PosPid.KpMin" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="Speed" lv-hidden="" lv-width="372,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.Speed.CurrentSpeedDir" unit="" formula="" addr="" desc="MC.Speed.CurrentSpeedDir" interval="1" showType="Signed" color=""/>
-            <var name="MC.Speed.SpeedCalculateCnt" unit="" formula="" addr="" desc="MC.Speed.SpeedCalculateCnt" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Speed.ElectricalValMax" unit="" formula="" addr="" desc="MC.Speed.ElectricalValMax" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Speed.ElectricalPosThis" unit="" formula="" addr="" desc="MC.Speed.ElectricalPosThis" interval="1" showType="Signed" color=""/>
-            <var name="MC.Speed.ElectricalPosLast" unit="" formula="" addr="" desc="MC.Speed.ElectricalPosLast" interval="1" showType="Signed" color=""/>
-            <var name="MC.Speed.ElectricalPosChange" unit="" formula="" addr="" desc="MC.Speed.ElectricalPosChange" interval="1" showType="Signed" color=""/>
-            <var name="MC.Speed.ElectricalSpeedFactor" unit="" formula="" addr="" desc="MC.Speed.ElectricalSpeedFactor" interval="1" showType="Real" color=""/>
-            <var name="MC.Speed.ElectricalSpeedRaw" unit="" formula="" addr="" desc="MC.Speed.ElectricalSpeedRaw" interval="1" showType="Real" color=""/>
-            <var name="MC.Speed.ElectricalSpeedLPF" unit="" formula="" addr="" desc="MC.Speed.ElectricalSpeedLPF" interval="1" showType="Real" color=""/>
-            <var name="MC.Speed.ElectricalSpeedLPFFactor" unit="" formula="" addr="" desc="MC.Speed.ElectricalSpeedLPFFactor" interval="1" showType="Real" color=""/>
-            <var name="MC.Speed.MechanicalSpeed" unit="" formula="" addr="" desc="MC.Speed.MechanicalSpeed" interval="1" showType="Real" color=""/>
-            <var name="MC.Speed.MechanicalSpeedSet" unit="" formula="" addr="" desc="MC.Speed.MechanicalSpeedSet" interval="1" showType="Real" color=""/>
-            <var name="MC.Speed.MechanicalSpeedSetLast" unit="" formula="" addr="" desc="MC.Speed.MechanicalSpeedSetLast" interval="1" showType="Real" color=""/>
+        <form title="Speed" page="0" floating="0" lv-width="372,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.Speed.CurrentSpeedDir" showType="Signed" interval="1" formula="" desc="MC.Speed.CurrentSpeedDir" addr=""/>
+            <var unit="" color="" name="MC.Speed.SpeedCalculateCnt" showType="Unsigned" interval="1" formula="" desc="MC.Speed.SpeedCalculateCnt" addr=""/>
+            <var unit="" color="" name="MC.Speed.ElectricalValMax" showType="Unsigned" interval="1" formula="" desc="MC.Speed.ElectricalValMax" addr=""/>
+            <var unit="" color="" name="MC.Speed.ElectricalPosThis" showType="Signed" interval="1" formula="" desc="MC.Speed.ElectricalPosThis" addr=""/>
+            <var unit="" color="" name="MC.Speed.ElectricalPosLast" showType="Signed" interval="1" formula="" desc="MC.Speed.ElectricalPosLast" addr=""/>
+            <var unit="" color="" name="MC.Speed.ElectricalPosChange" showType="Signed" interval="1" formula="" desc="MC.Speed.ElectricalPosChange" addr=""/>
+            <var unit="" color="" name="MC.Speed.ElectricalSpeedFactor" showType="Real" interval="1" formula="" desc="MC.Speed.ElectricalSpeedFactor" addr=""/>
+            <var unit="" color="" name="MC.Speed.ElectricalSpeedRaw" showType="Real" interval="1" formula="" desc="MC.Speed.ElectricalSpeedRaw" addr=""/>
+            <var unit="" color="" name="MC.Speed.ElectricalSpeedLPF" showType="Real" interval="1" formula="" desc="MC.Speed.ElectricalSpeedLPF" addr=""/>
+            <var unit="" color="" name="MC.Speed.ElectricalSpeedLPFFactor" showType="Real" interval="1" formula="" desc="MC.Speed.ElectricalSpeedLPFFactor" addr=""/>
+            <var unit="" color="" name="MC.Speed.MechanicalSpeed" showType="Real" interval="1" formula="" desc="MC.Speed.MechanicalSpeed" addr=""/>
+            <var unit="" color="" name="MC.Speed.MechanicalSpeedSet" showType="Real" interval="1" formula="" desc="MC.Speed.MechanicalSpeedSet" addr=""/>
+            <var unit="" color="" name="MC.Speed.MechanicalSpeedSetLast" showType="Real" interval="1" formula="" desc="MC.Speed.MechanicalSpeedSetLast" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="TAccDec" lv-hidden="" lv-width="256,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.TAccDec.StartSpeed" unit="" formula="" addr="" desc="MC.TAccDec.StartSpeed" interval="1" showType="Real" color=""/>
-            <var name="MC.TAccDec.EndSpeed" unit="" formula="" addr="" desc="MC.TAccDec.EndSpeed" interval="1" showType="Real" color=""/>
-            <var name="MC.TAccDec.AccSpeed" unit="" formula="" addr="" desc="MC.TAccDec.AccSpeed" interval="1" showType="Real" color=""/>
-            <var name="MC.TAccDec.SumSpeed" unit="" formula="" addr="" desc="MC.TAccDec.SumSpeed" interval="1" showType="Real" color=""/>
-            <var name="MC.TAccDec.DecSpeed" unit="" formula="" addr="" desc="MC.TAccDec.DecSpeed" interval="1" showType="Real" color=""/>
-            <var name="MC.TAccDec.SpeedOut" unit="" formula="" addr="" desc="MC.TAccDec.SpeedOut" interval="1" showType="Real" color=""/>
-            <var name="MC.TAccDec.FinishFlag" unit="" formula="" addr="" desc="MC.TAccDec.FinishFlag" interval="1" showType="Unsigned" color=""/>
+        <form title="TAccDec" page="0" floating="0" lv-width="256,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.TAccDec.StartSpeed" showType="Real" interval="1" formula="" desc="MC.TAccDec.StartSpeed" addr=""/>
+            <var unit="" color="" name="MC.TAccDec.EndSpeed" showType="Real" interval="1" formula="" desc="MC.TAccDec.EndSpeed" addr=""/>
+            <var unit="" color="" name="MC.TAccDec.AccSpeed" showType="Real" interval="1" formula="" desc="MC.TAccDec.AccSpeed" addr=""/>
+            <var unit="" color="" name="MC.TAccDec.SumSpeed" showType="Real" interval="1" formula="" desc="MC.TAccDec.SumSpeed" addr=""/>
+            <var unit="" color="" name="MC.TAccDec.DecSpeed" showType="Real" interval="1" formula="" desc="MC.TAccDec.DecSpeed" addr=""/>
+            <var unit="" color="" name="MC.TAccDec.SpeedOut" showType="Real" interval="1" formula="" desc="MC.TAccDec.SpeedOut" addr=""/>
+            <var unit="" color="" name="MC.TAccDec.FinishFlag" showType="Unsigned" interval="1" formula="" desc="MC.TAccDec.FinishFlag" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="Position" lv-hidden="" lv-width="345,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.Position.PosCalculateCnt" unit="" formula="" addr="" desc="MC.Position.PosCalculateCnt" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Position.ElectricalValMax" unit="" formula="" addr="" desc="MC.Position.ElectricalValMax" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.Position.ElectricalPosThis" unit="" formula="" addr="" desc="MC.Position.ElectricalPosThis" interval="1" showType="Signed" color=""/>
-            <var name="MC.Position.ElectricalPosLast" unit="" formula="" addr="" desc="MC.Position.ElectricalPosLast" interval="1" showType="Signed" color=""/>
-            <var name="MC.Position.ElectricalPosChange" unit="" formula="" addr="" desc="MC.Position.ElectricalPosChange" interval="1" showType="Signed" color=""/>
-            <var name="MC.Position.ElectricalPosSum" unit="" formula="" addr="" desc="MC.Position.ElectricalPosSum" interval="1" showType="Signed" color=""/>
-            <var name="MC.Position.MechanicalPosRaw" unit="" formula="" addr="" desc="MC.Position.MechanicalPosRaw" interval="1" showType="Signed" color=""/>
-            <var name="MC.Position.MechanicalPosSet" unit="" formula="" addr="" desc="MC.Position.MechanicalPosSet" interval="1" showType="Signed" color=""/>
+        <form title="Position" page="0" floating="0" lv-width="345,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.Position.PosCalculateCnt" showType="Unsigned" interval="1" formula="" desc="MC.Position.PosCalculateCnt" addr=""/>
+            <var unit="" color="" name="MC.Position.ElectricalValMax" showType="Unsigned" interval="1" formula="" desc="MC.Position.ElectricalValMax" addr=""/>
+            <var unit="" color="" name="MC.Position.ElectricalPosThis" showType="Signed" interval="1" formula="" desc="MC.Position.ElectricalPosThis" addr=""/>
+            <var unit="" color="" name="MC.Position.ElectricalPosLast" showType="Signed" interval="1" formula="" desc="MC.Position.ElectricalPosLast" addr=""/>
+            <var unit="" color="" name="MC.Position.ElectricalPosChange" showType="Signed" interval="1" formula="" desc="MC.Position.ElectricalPosChange" addr=""/>
+            <var unit="" color="" name="MC.Position.ElectricalPosSum" showType="Signed" interval="1" formula="" desc="MC.Position.ElectricalPosSum" addr=""/>
+            <var unit="" color="" name="MC.Position.MechanicalPosRaw" showType="Signed" interval="1" formula="" desc="MC.Position.MechanicalPosRaw" addr=""/>
+            <var unit="" color="" name="MC.Position.MechanicalPosSet" showType="Signed" interval="1" formula="" desc="MC.Position.MechanicalPosSet" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="SMO" lv-hidden="" lv-width="287,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.SMO.Ts" unit="" formula="" addr="" desc="MC.SMO.Ts" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.Rs" unit="" formula="" addr="" desc="MC.SMO.Rs" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.Ld" unit="" formula="" addr="" desc="MC.SMO.Ld" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.Gain" unit="" formula="" addr="" desc="MC.SMO.Gain" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.Ialpha" unit="" formula="" addr="" desc="MC.SMO.Ialpha" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.Ibeta" unit="" formula="" addr="" desc="MC.SMO.Ibeta" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.IalphaFore" unit="" formula="" addr="" desc="MC.SMO.IalphaFore" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.IbetaFore" unit="" formula="" addr="" desc="MC.SMO.IbetaFore" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.Ualpha" unit="" formula="" addr="" desc="MC.SMO.Ualpha" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.Ubeta" unit="" formula="" addr="" desc="MC.SMO.Ubeta" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.EalphaFore" unit="" formula="" addr="" desc="MC.SMO.EalphaFore" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.EalphaForeLPF" unit="" formula="" addr="" desc="MC.SMO.EalphaForeLPF" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.EbetaFore" unit="" formula="" addr="" desc="MC.SMO.EbetaFore" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.EbetaForeLPF" unit="" formula="" addr="" desc="MC.SMO.EbetaForeLPF" interval="1" showType="Real" color=""/>
-            <var name="MC.SMO.EabForeLPFFactor" unit="" formula="" addr="" desc="MC.SMO.EabForeLPFFactor" interval="1" showType="Real" color=""/>
+        <form title="SMO" page="0" floating="0" lv-width="287,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.SMO.Ts" showType="Real" interval="1" formula="" desc="MC.SMO.Ts" addr=""/>
+            <var unit="" color="" name="MC.SMO.Rs" showType="Real" interval="1" formula="" desc="MC.SMO.Rs" addr=""/>
+            <var unit="" color="" name="MC.SMO.Ld" showType="Real" interval="1" formula="" desc="MC.SMO.Ld" addr=""/>
+            <var unit="" color="" name="MC.SMO.Gain" showType="Real" interval="1" formula="" desc="MC.SMO.Gain" addr=""/>
+            <var unit="" color="" name="MC.SMO.Ialpha" showType="Real" interval="1" formula="" desc="MC.SMO.Ialpha" addr=""/>
+            <var unit="" color="" name="MC.SMO.Ibeta" showType="Real" interval="1" formula="" desc="MC.SMO.Ibeta" addr=""/>
+            <var unit="" color="" name="MC.SMO.IalphaFore" showType="Real" interval="1" formula="" desc="MC.SMO.IalphaFore" addr=""/>
+            <var unit="" color="" name="MC.SMO.IbetaFore" showType="Real" interval="1" formula="" desc="MC.SMO.IbetaFore" addr=""/>
+            <var unit="" color="" name="MC.SMO.Ualpha" showType="Real" interval="1" formula="" desc="MC.SMO.Ualpha" addr=""/>
+            <var unit="" color="" name="MC.SMO.Ubeta" showType="Real" interval="1" formula="" desc="MC.SMO.Ubeta" addr=""/>
+            <var unit="" color="" name="MC.SMO.EalphaFore" showType="Real" interval="1" formula="" desc="MC.SMO.EalphaFore" addr=""/>
+            <var unit="" color="" name="MC.SMO.EalphaForeLPF" showType="Real" interval="1" formula="" desc="MC.SMO.EalphaForeLPF" addr=""/>
+            <var unit="" color="" name="MC.SMO.EbetaFore" showType="Real" interval="1" formula="" desc="MC.SMO.EbetaFore" addr=""/>
+            <var unit="" color="" name="MC.SMO.EbetaForeLPF" showType="Real" interval="1" formula="" desc="MC.SMO.EbetaForeLPF" addr=""/>
+            <var unit="" color="" name="MC.SMO.EabForeLPFFactor" showType="Real" interval="1" formula="" desc="MC.SMO.EabForeLPFFactor" addr=""/>
         </form>
-        <form floating="0" page="0" visible="0" type="7" title="HFI" lv-hidden="" lv-width="150,150,100,100,100,100,100,100,100,120,100,100">
-            <var name="MC.HFI.NSDOut" unit="" formula="" addr="" desc="MC.HFI.NSDOut" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.HFI.NSDFlag" unit="" formula="" addr="" desc="MC.HFI.NSDFlag" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.HFI.NSDCount" unit="" formula="" addr="" desc="MC.HFI.NSDCount" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.HFI.NSDSum1" unit="" formula="" addr="" desc="MC.HFI.NSDSum1" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.NSDSum2" unit="" formula="" addr="" desc="MC.HFI.NSDSum2" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IdRef" unit="" formula="" addr="" desc="MC.HFI.IdRef" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IdHigh" unit="" formula="" addr="" desc="MC.HFI.IdHigh" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.Dir" unit="" formula="" addr="" desc="MC.HFI.Dir" interval="1" showType="Unsigned" color=""/>
-            <var name="MC.HFI.Uin" unit="" formula="" addr="" desc="MC.HFI.Uin" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.Id" unit="" formula="" addr="" desc="MC.HFI.Id" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IdLast" unit="" formula="" addr="" desc="MC.HFI.IdLast" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IdBase" unit="" formula="" addr="" desc="MC.HFI.IdBase" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.Iq" unit="" formula="" addr="" desc="MC.HFI.Iq" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IqLast" unit="" formula="" addr="" desc="MC.HFI.IqLast" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IqBase" unit="" formula="" addr="" desc="MC.HFI.IqBase" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.Ialpha" unit="" formula="" addr="" desc="MC.HFI.Ialpha" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IalphaLast" unit="" formula="" addr="" desc="MC.HFI.IalphaLast" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IalphaHigh" unit="" formula="" addr="" desc="MC.HFI.IalphaHigh" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IalphaHighLast" unit="" formula="" addr="" desc="MC.HFI.IalphaHighLast" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.Ibeta" unit="" formula="" addr="" desc="MC.HFI.Ibeta" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IbetaLast" unit="" formula="" addr="" desc="MC.HFI.IbetaLast" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IbetaHigh" unit="" formula="" addr="" desc="MC.HFI.IbetaHigh" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IbetaHighLast" unit="" formula="" addr="" desc="MC.HFI.IbetaHighLast" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IalphaOut" unit="" formula="" addr="" desc="MC.HFI.IalphaOut" interval="1" showType="Real" color=""/>
-            <var name="MC.HFI.IbetaOut" unit="" formula="" addr="" desc="MC.HFI.IbetaOut" interval="1" showType="Real" color=""/>
+        <form title="HFI" page="0" floating="0" lv-width="150,150,100,100,100,100,100,100,100,120,100,100" visible="0" lv-hidden="" type="7">
+            <var unit="" color="" name="MC.HFI.NSDOut" showType="Unsigned" interval="1" formula="" desc="MC.HFI.NSDOut" addr=""/>
+            <var unit="" color="" name="MC.HFI.NSDFlag" showType="Unsigned" interval="1" formula="" desc="MC.HFI.NSDFlag" addr=""/>
+            <var unit="" color="" name="MC.HFI.NSDCount" showType="Unsigned" interval="1" formula="" desc="MC.HFI.NSDCount" addr=""/>
+            <var unit="" color="" name="MC.HFI.NSDSum1" showType="Real" interval="1" formula="" desc="MC.HFI.NSDSum1" addr=""/>
+            <var unit="" color="" name="MC.HFI.NSDSum2" showType="Real" interval="1" formula="" desc="MC.HFI.NSDSum2" addr=""/>
+            <var unit="" color="" name="MC.HFI.IdRef" showType="Real" interval="1" formula="" desc="MC.HFI.IdRef" addr=""/>
+            <var unit="" color="" name="MC.HFI.IdHigh" showType="Real" interval="1" formula="" desc="MC.HFI.IdHigh" addr=""/>
+            <var unit="" color="" name="MC.HFI.Dir" showType="Unsigned" interval="1" formula="" desc="MC.HFI.Dir" addr=""/>
+            <var unit="" color="" name="MC.HFI.Uin" showType="Real" interval="1" formula="" desc="MC.HFI.Uin" addr=""/>
+            <var unit="" color="" name="MC.HFI.Id" showType="Real" interval="1" formula="" desc="MC.HFI.Id" addr=""/>
+            <var unit="" color="" name="MC.HFI.IdLast" showType="Real" interval="1" formula="" desc="MC.HFI.IdLast" addr=""/>
+            <var unit="" color="" name="MC.HFI.IdBase" showType="Real" interval="1" formula="" desc="MC.HFI.IdBase" addr=""/>
+            <var unit="" color="" name="MC.HFI.Iq" showType="Real" interval="1" formula="" desc="MC.HFI.Iq" addr=""/>
+            <var unit="" color="" name="MC.HFI.IqLast" showType="Real" interval="1" formula="" desc="MC.HFI.IqLast" addr=""/>
+            <var unit="" color="" name="MC.HFI.IqBase" showType="Real" interval="1" formula="" desc="MC.HFI.IqBase" addr=""/>
+            <var unit="" color="" name="MC.HFI.Ialpha" showType="Real" interval="1" formula="" desc="MC.HFI.Ialpha" addr=""/>
+            <var unit="" color="" name="MC.HFI.IalphaLast" showType="Real" interval="1" formula="" desc="MC.HFI.IalphaLast" addr=""/>
+            <var unit="" color="" name="MC.HFI.IalphaHigh" showType="Real" interval="1" formula="" desc="MC.HFI.IalphaHigh" addr=""/>
+            <var unit="" color="" name="MC.HFI.IalphaHighLast" showType="Real" interval="1" formula="" desc="MC.HFI.IalphaHighLast" addr=""/>
+            <var unit="" color="" name="MC.HFI.Ibeta" showType="Real" interval="1" formula="" desc="MC.HFI.Ibeta" addr=""/>
+            <var unit="" color="" name="MC.HFI.IbetaLast" showType="Real" interval="1" formula="" desc="MC.HFI.IbetaLast" addr=""/>
+            <var unit="" color="" name="MC.HFI.IbetaHigh" showType="Real" interval="1" formula="" desc="MC.HFI.IbetaHigh" addr=""/>
+            <var unit="" color="" name="MC.HFI.IbetaHighLast" showType="Real" interval="1" formula="" desc="MC.HFI.IbetaHighLast" addr=""/>
+            <var unit="" color="" name="MC.HFI.IalphaOut" showType="Real" interval="1" formula="" desc="MC.HFI.IalphaOut" addr=""/>
+            <var unit="" color="" name="MC.HFI.IbetaOut" showType="Real" interval="1" formula="" desc="MC.HFI.IbetaOut" addr=""/>
         </form>
-        <form floating="0" page="0" visible="1" type="7" title="SPLL" lv-hidden="" lv-width="448,100,100,100,100,100,100,100,100,120,100,791">
-            <var name="htim1.Instance->CCR1" unit="" formula="" addr="0x20000120" desc="htim1.Instance->CCR1" interval="1" showType="Unsigned" color=""/>
-            <var name="htim1.Instance->CCR2" unit="" formula="" addr="0x20000120" desc="htim1.Instance->CCR2" interval="1" showType="Unsigned" color=""/>
-            <var name="htim1.Instance->CCR3" unit="" formula="" addr="0x20000120" desc="htim1.Instance->CCR3" interval="1" showType="Unsigned" color=""/>
-            <var name="htim1.Instance->ARR" unit="" formula="" addr="0x20000120" desc="htim1.Instance->ARR" interval="1" showType="Unsigned" color=""/>
-            <var name="hadc2.Instance->JDR1" unit="" formula="" addr="0x200000b4" desc="hadc2.Instance->JDR1" interval="1" showType="Unsigned" color=""/>
-            <var name="hadc2.Instance->JDR2" unit="" formula="" addr="0x200000b4" desc="hadc2.Instance->JDR2" interval="1" showType="Unsigned" color=""/>
-            <var name="g_fault_code" unit="" formula="" addr="0x20000001" desc="g_fault_code" interval="1" showType="Unsigned" color=""/>
-            <var name="g_fault_latch" unit="" formula="" addr="0x20000002" desc="g_fault_latch" interval="1" showType="Unsigned" color=""/>
-            <var name="ia" unit="" formula="" addr="0x2000000c" desc="ia" interval="1" showType="Real" color=""/>
-            <var name="ib" unit="" formula="" addr="0x20000010" desc="ib" interval="1" showType="Real" color=""/>
-            <var name="ic" unit="" formula="" addr="0x20000014" desc="ic" interval="1" showType="Real" color=""/>
-            <var name="theta_e" unit="" formula="" addr="0x20000038" desc="theta_e" interval="1" showType="Real" color=""/>
-            <var name="freq_e" unit="" formula="" addr="0x2000006c" desc="freq_e" interval="1" showType="Real" color=""/>
-            <var name="v_amp" unit="" formula="" addr="0x20000080" desc="v_amp" interval="1" showType="Real" color=""/>
-            <var name="vbus_voltage" unit="" formula="" addr="0x20000084" desc="vbus_voltage" interval="1" showType="Real" color=""/>
-            <var name="hadc2.Instance->DR" unit="" formula="" addr="0x200000b4" desc="hadc2.Instance->DR" interval="1" showType="Unsigned" color=""/>
-            <var name="main##key_pressed" unit="" formula="" addr="" desc="main##key_pressed" interval="1" showType="Unsigned" color=""/>
-            <var name="spd_target_rpm" unit="" formula="" addr="0x20000044" desc="spd_target_rpm" interval="1" showType="Real" color=""/>
+        <form title="SPLL" page="0" floating="0" lv-width="448,100,100,100,100,100,100,100,100,120,100,791" visible="1" lv-hidden="" type="7">
+            <var unit="" color="" name="htim1.Instance->CCR1" showType="Unsigned" interval="1" formula="" desc="htim1.Instance->CCR1" addr="0x2000011c"/>
+            <var unit="" color="" name="htim1.Instance->CCR2" showType="Unsigned" interval="1" formula="" desc="htim1.Instance->CCR2" addr="0x2000011c"/>
+            <var unit="" color="" name="htim1.Instance->CCR3" showType="Unsigned" interval="1" formula="" desc="htim1.Instance->CCR3" addr="0x2000011c"/>
+            <var unit="" color="" name="htim1.Instance->ARR" showType="Unsigned" interval="1" formula="" desc="htim1.Instance->ARR" addr="0x2000011c"/>
+            <var unit="" color="" name="hadc2.Instance->JDR1" showType="Unsigned" interval="1" formula="" desc="hadc2.Instance->JDR1" addr="0x20000050"/>
+            <var unit="" color="" name="hadc2.Instance->JDR2" showType="Unsigned" interval="1" formula="" desc="hadc2.Instance->JDR2" addr="0x20000050"/>
+            <var unit="" color="" name="g_motor.pi_speed.integral" showType="Real" interval="1" formula="" desc="g_motor.pi_speed.integral" addr="0x200002cc"/>
+            <var unit="" color="" name="g_motor.pi_id.integral" showType="Real" interval="1" formula="" desc="g_motor.pi_id.integral" addr="0x200002e8"/>
+            <var unit="" color="" name="g_motor.pi_iq.integral" showType="Real" interval="1" formula="" desc="g_motor.pi_iq.integral" addr="0x200002fc"/>
         </form>
-        <form min="-500" refValue="0" autoRange="1" subMode="0" refType="0" visible="0" filterType="1" trigType="0" trigName="" lineStyle="1" scrollType="0" trigValue="0" scatterStyle="1" max="500" page="0" floating="0" xTag="0" refName="" type="8" xCount="522.006" title="Encoder">
-            <var name="htim3.Instance->CNT" subPlot="0" desc="htim3.Instance->CNT" color="#ff0000"/>
+        <form max="500" scrollType="0" refName="" xTag="0" trigName="" subMode="0" scatterStyle="1" filterType="1" type="8" min="-500" refValue="0" lineStyle="1" title="Encoder" visible="0" floating="0" autoRange="1" trigValue="0" refType="0" trigType="0" page="0" xCount="522.006">
+            <var color="#ff0000" name="htim3.Instance->CNT" subPlot="0" desc="htim3.Instance->CNT"/>
         </form>
-        <form min="-500" refValue="0" autoRange="1" subMode="0" refType="0" visible="0" filterType="1" trigType="0" trigName="" lineStyle="1" scrollType="0" trigValue="0" scatterStyle="1" max="500" page="0" floating="0" xTag="0" refName="" type="8" xCount="1501.69" title="Iabc">
-            <var name="ia" subPlot="0" desc="ia" color="#ff0000"/>
-            <var name="ib" subPlot="0" desc="ib" color="#00ff00"/>
-            <var name="ic" subPlot="0" desc="ic" color="#00ffff"/>
+        <form max="500" scrollType="0" refName="" xTag="0" trigName="" subMode="0" scatterStyle="1" filterType="1" type="8" min="-500" refValue="0" lineStyle="1" title="Iabc" visible="0" floating="0" autoRange="1" trigValue="0" refType="0" trigType="0" page="0" xCount="1501.69">
+            <var color="#ff0000" name="ia" subPlot="0" desc="ia"/>
+            <var color="#00ff00" name="ib" subPlot="0" desc="ib"/>
+            <var color="#00ffff" name="ic" subPlot="0" desc="ic"/>
         </form>
-        <form min="-500" refValue="0" autoRange="1" subMode="0" refType="0" visible="0" filterType="1" trigType="0" trigName="" lineStyle="1" scrollType="0" trigValue="0" scatterStyle="1" max="500" page="0" floating="0" xTag="0" refName="" type="8" xCount="1000" title="CCR">
-            <var name="htim1.Instance->CCR1" subPlot="0" desc="htim1.Instance->CCR1" color="#ff0000"/>
-            <var name="htim1.Instance->CCR2" subPlot="0" desc="htim1.Instance->CCR2" color="#00ff00"/>
-            <var name="htim1.Instance->CCR3" subPlot="0" desc="htim1.Instance->CCR3" color="#00ffff"/>
+        <form max="500" scrollType="0" refName="" xTag="0" trigName="" subMode="0" scatterStyle="1" filterType="1" type="8" min="-500" refValue="0" lineStyle="1" title="CCR" visible="0" floating="0" autoRange="1" trigValue="0" refType="0" trigType="0" page="0" xCount="1000">
+            <var color="#ff0000" name="htim1.Instance->CCR1" subPlot="0" desc="htim1.Instance->CCR1"/>
+            <var color="#00ff00" name="htim1.Instance->CCR2" subPlot="0" desc="htim1.Instance->CCR2"/>
+            <var color="#00ffff" name="htim1.Instance->CCR3" subPlot="0" desc="htim1.Instance->CCR3"/>
         </form>
-        <form min="-500" refValue="0" autoRange="1" subMode="0" refType="0" visible="0" filterType="1" trigType="0" trigName="" lineStyle="1" scrollType="0" trigValue="0" scatterStyle="1" max="500" page="0" floating="0" xTag="0" refName="" type="8" xCount="1000" title="duty">
-            <var name="Ia" subPlot="0" desc="Ia" color="#ff0000"/>
-            <var name="Ib" subPlot="0" desc="Ib" color="#00ff00"/>
-            <var name="Ic" subPlot="0" desc="Ic" color="#00ffff"/>
+        <form max="500" scrollType="0" refName="" xTag="0" trigName="" subMode="0" scatterStyle="1" filterType="1" type="8" min="-500" refValue="0" lineStyle="1" title="duty" visible="0" floating="0" autoRange="1" trigValue="0" refType="0" trigType="0" page="0" xCount="1000">
+            <var color="#ff0000" name="Ia" subPlot="0" desc="Ia"/>
+            <var color="#00ff00" name="Ib" subPlot="0" desc="Ib"/>
+            <var color="#00ffff" name="Ic" subPlot="0" desc="Ic"/>
         </form>
-        <form min="-500" refValue="0" autoRange="1" subMode="0" refType="0" visible="0" filterType="1" trigType="0" trigName="" lineStyle="1" scrollType="0" trigValue="0" scatterStyle="1" max="500" page="0" floating="0" xTag="0" refName="" type="8" xCount="1000" title="sin"/>
-        <form min="-500" refValue="0" autoRange="1" subMode="0" refType="0" visible="0" filterType="1" trigType="0" trigName="" lineStyle="1" scrollType="0" trigValue="0" scatterStyle="1" max="500" page="0" floating="0" xTag="0" refName="" type="8" xCount="1000" title="svm_sectpr">
-            <var name="svm_sector" subPlot="0" desc="svm_sector" color="#ff0000"/>
+        <form max="500" scrollType="0" refName="" xTag="0" trigName="" subMode="0" scatterStyle="1" filterType="1" type="8" min="-500" refValue="0" lineStyle="1" title="sin" visible="0" floating="0" autoRange="1" trigValue="0" refType="0" trigType="0" page="0" xCount="1000"/>
+        <form max="500" scrollType="0" refName="" xTag="0" trigName="" subMode="0" scatterStyle="1" filterType="1" type="8" min="-500" refValue="0" lineStyle="1" title="svm_sectpr" visible="0" floating="0" autoRange="1" trigValue="0" refType="0" trigType="0" page="0" xCount="1000">
+            <var color="#ff0000" name="svm_sector" subPlot="0" desc="svm_sector"/>
         </form>
-        <form min="-500" refValue="0" autoRange="1" subMode="0" refType="0" visible="0" filterType="1" trigType="0" trigName="" lineStyle="1" scrollType="0" trigValue="0" scatterStyle="1" max="500" page="0" floating="0" xTag="0" refName="" type="8" xCount="1000" title="dutyv">
-            <var name="HAL_ADCEx_InjectedConvCpltCallback##duty_a" subPlot="0" desc="HAL_ADCEx_InjectedConvCpltCallback##duty_a" color="#ff0000"/>
-            <var name="HAL_ADCEx_InjectedConvCpltCallback##duty_b" subPlot="0" desc="HAL_ADCEx_InjectedConvCpltCallback##duty_b" color="#00ff00"/>
-            <var name="HAL_ADCEx_InjectedConvCpltCallback##duty_c" subPlot="0" desc="HAL_ADCEx_InjectedConvCpltCallback##duty_c" color="#00ffff"/>
+        <form max="500" scrollType="0" refName="" xTag="0" trigName="" subMode="0" scatterStyle="1" filterType="1" type="8" min="-500" refValue="0" lineStyle="1" title="dutyv" visible="0" floating="0" autoRange="1" trigValue="0" refType="0" trigType="0" page="0" xCount="1000">
+            <var color="#ff0000" name="HAL_ADCEx_InjectedConvCpltCallback##duty_a" subPlot="0" desc="HAL_ADCEx_InjectedConvCpltCallback##duty_a"/>
+            <var color="#00ff00" name="HAL_ADCEx_InjectedConvCpltCallback##duty_b" subPlot="0" desc="HAL_ADCEx_InjectedConvCpltCallback##duty_b"/>
+            <var color="#00ffff" name="HAL_ADCEx_InjectedConvCpltCallback##duty_c" subPlot="0" desc="HAL_ADCEx_InjectedConvCpltCallback##duty_c"/>
+        </form>
+        <form max="500" scrollType="0" refName="" xTag="0" trigName="" subMode="0" scatterStyle="1" filterType="1" type="8" min="-500" refValue="0" lineStyle="1" title="曲线7" visible="1" floating="0" autoRange="1" trigValue="0" refType="0" trigType="0" page="0" xCount="655.988">
+            <var color="#00ffff" name="g_motor.pi_speed.integral" subPlot="0" desc="g_motor.pi_speed.integral"/>
         </form>
     </forms>
 </lksscope>

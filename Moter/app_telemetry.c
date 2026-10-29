@@ -34,11 +34,11 @@ void APP_Telemetry_Send(Motor_Ctrl_t *motor) {
         
         // 2. 填充通道 (根据你的需求调整)
         tx_frame.ch[0] = motor->target_rpm;     // 目标转速
-        tx_frame.ch[1] = motor->obs.speed_rpm;  // 实际转速
+        tx_frame.ch[1] = motor->obs.speed_rpm_filt;  // 实际转速
         tx_frame.ch[2] = motor->iq_ref;         // Iq 目标
         tx_frame.ch[3] = motor->i_q;            // Iq 实际
-        tx_frame.ch[4] = motor->v_d;            // Vd
-        tx_frame.ch[5] = motor->v_q;            // Vq
+        tx_frame.ch[4] = motor->id_fw_ref;      // id 目标
+        tx_frame.ch[5] = motor->i_d;            // i_d 实际
 
         // 3. 启动 DMA 发送
         HAL_UART_Transmit_DMA(&huart1, (uint8_t *)&tx_frame, sizeof(VOFA_Frame_t));

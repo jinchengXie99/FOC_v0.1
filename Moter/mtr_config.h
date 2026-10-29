@@ -26,20 +26,20 @@
 /* ============================================================
  * 控制环路参数
  * ============================================================ */
-#define CURRENT_BANDWIDTH       2000.0f    /* 电流环带宽 (rad/s) */
+#define CURRENT_BANDWIDTH       8000.0f    /* 电流环带宽 (rad/s) */
 #define CURRENT_KP              (MOTOR_LS * CURRENT_BANDWIDTH)
 #define CURRENT_KI              (MOTOR_RS * CURRENT_BANDWIDTH)
 
-#define SPD_KP                  0.00005f 	    /* 速度环 Kp (A/RPM) */
-#define SPD_KI                  0.0001f     /* 速度环 Ki (A/(RPM*s)) */
-#define MAX_IQ_CURRENT          5.0f       /* 正向电流上限 (A) */
-#define MIN_IQ_CURRENT          -5.0f      /* 反向电流上限 (A) */
+#define SPD_KP                  0.001f 	    /* 速度环 Kp (A/RPM) */
+#define SPD_KI                  0.0005f     /* 速度环 Ki (A/(RPM*s)) */
+#define MAX_IQ_CURRENT          10.0f       /* 正向电流上限 (A) */
+#define MIN_IQ_CURRENT          -10.0f      /* 反向电流上限 (A) */
 
-#define OBSERVER_GAIN           50.0f      /* VESC观测器增益 */
+#define OBSERVER_GAIN           500.0f      /* VESC观测器增益 */
 #define PLL_KP                  30.0f       /* PLL 比例 */
-#define PLL_KI                  500.0f      /* PLL 积分 */
+#define PLL_KI                  3000.0f      /* PLL 积分 */
 
-#define IF_START_FREQ           20.0f       /* 强拖切入频率 (Hz) */
+#define IF_START_FREQ           10.0f       /* 强拖切入频率 (Hz) */
 #define IF_RAMP_RATE            15.0f       /* 强拖频率爬坡 (Hz/s) */
 #define IF_START_IQ             0.5f        /* 强拖启动电流 (A) */
 #define BRAKE_CURRENT           0.5f        /* 制动电流 (A) */

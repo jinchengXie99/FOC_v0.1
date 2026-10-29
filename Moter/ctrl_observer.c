@@ -13,6 +13,7 @@ void Ctrl_Observer_Init(Ctrl_Observer_t *obs) {
     obs->theta_est = 0.0f;
     obs->omega_est = 0.0f;
     obs->speed_rpm = 0.0f;
+	obs->speed_rpm_filt  = 0.0f;
 }
 
 /* ============================================================

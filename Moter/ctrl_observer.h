@@ -12,6 +12,7 @@ typedef struct {
     volatile float theta_est;    // 估计电角度
     volatile float omega_est;    // 估计电角速度 (rad/s)
     volatile float speed_rpm;    // 估计机械转速 (RPM)
+		volatile float speed_rpm_filt;
 } Ctrl_Observer_t;
 
 void Ctrl_Observer_Init(Ctrl_Observer_t *obs);

@@ -9,8 +9,8 @@ void APP_Init(void) {
     Speed_PI_Init(&g_motor.pi_speed, SPD_KP, SPD_KI, MAX_IQ_CURRENT, MIN_IQ_CURRENT);
     
     // 初始化电流环：输出的是目标电压 Vd, Vq。假设最大电压为 15V
-    Current_PI_Init(&g_motor.pi_id, CURRENT_KP, CURRENT_KI, 15.0f);
-    Current_PI_Init(&g_motor.pi_iq, CURRENT_KP, CURRENT_KI, 15.0f);
+    Current_PI_Init(&g_motor.pi_id, CURRENT_KP, CURRENT_KI, 13.5f);
+    Current_PI_Init(&g_motor.pi_iq, CURRENT_KP, CURRENT_KI, 13.5f);
    
     
     g_motor.state = STATE_IDLE;
