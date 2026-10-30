@@ -5,8 +5,8 @@
  * ============================================================ */
 #define THROTTLE_V_MIN      0.1f    /* 起调电压 (V)，留出死区防止抖动 */
 #define THROTTLE_V_MAX      3.2f    /* 满速电压 (V) */
-#define THROTTLE_RPM_MAX    5000.0f /* 目标最高转速 (RPM) */
-#define THROTTLE_LPF_ALPHA  0.05f   /* 一阶低通滤波系数，越小越平滑 */
+#define THROTTLE_RPM_MAX    4000.0f /* 目标最高转速 (RPM) */
+#define THROTTLE_LPF_ALPHA  0.01f   /* 一阶低通滤波系数，越小越平滑 */
 
 static float throttle_v_filt = 0.0f; // 滤波后的电压状态
 

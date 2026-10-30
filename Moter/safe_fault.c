@@ -46,12 +46,22 @@ uint8_t SAFE_Check(float vbus, float ia, float ib, float ic) {
         return FAULT_OC_HARD; // 硬阈值过流，25A
     }
 
-    // 2. 软件级过压/欠压保护
+    /* 2. 过压保护 (必须加 3 次消抖，过滤加速瞬间的毛刺) */
+    static uint8_t ovp_debounce = 0;
+
     if (vbus > DRV_OVP_THRESHOLD) {
-        return FAULT_OVP; // 过压
+        if (++ovp_debounce >= 3) return FAULT_OVP;
+    } else {
+        ovp_debounce = 0;
     }
-    if (vbus < DRV_UVP_THRESHOLD && g_motor.state != STATE_IDLE) {
-        return FAULT_UVP; // 欠压
+
+    /* 3. 欠压保护 (运行状态下才检测，加 5 次消抖) */
+    static uint8_t uvp_debounce = 0;
+    if (g_motor.state != STATE_IDLE && vbus < DRV_UVP_THRESHOLD) {
+     
+        if (++uvp_debounce >= 5) return FAULT_UVP;
+    } else {
+        uvp_debounce = 0;
     }
 
     return FAULT_NONE; // 正常

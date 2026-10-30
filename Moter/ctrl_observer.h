@@ -18,7 +18,7 @@ typedef struct {
 void Ctrl_Observer_Init(Ctrl_Observer_t *obs);
 
 /* 在 20kHz 中断中调用 */
-void Ctrl_Observer_Update(Ctrl_Observer_t *obs, float v_alpha, float v_beta, float i_alpha, float i_beta, float dt);
+void Ctrl_Observer_Update(Ctrl_Observer_t *obs, float v_alpha, float v_beta, float i_alpha, float i_beta,float i_d,float i_q, float dt);
 
 /* 强拖切入闭环瞬间，强行对齐状态 */
 void Ctrl_Observer_ForceAlign(Ctrl_Observer_t *obs, float theta_if, float freq_e, float i_alpha, float i_beta);

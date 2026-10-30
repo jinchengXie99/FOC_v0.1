@@ -13,27 +13,44 @@ void Ctrl_Observer_Init(Ctrl_Observer_t *obs) {
     obs->theta_est = 0.0f;
     obs->omega_est = 0.0f;
     obs->speed_rpm = 0.0f;
-	obs->speed_rpm_filt  = 0.0f;
+	  obs->speed_rpm_filt  = 0.0f;
 }
 
 /* ============================================================
- * 20kHz 高频观测器更新 (VESC Ortega-Praly 算法)
+ * 20kHz 高频观测器更新 ( Ortega-Praly 算法)
  * ============================================================ */
-void Ctrl_Observer_Update(Ctrl_Observer_t *obs, float v_alpha, float v_beta, float i_alpha, float i_beta, float dt) {
-    // 1. 计算电感压降项
-    float L_ia = MOTOR_LS * i_alpha;
-    float L_ib = MOTOR_LS * i_beta;
+void Ctrl_Observer_Update(Ctrl_Observer_t *obs, float v_alpha, float v_beta, float i_alpha, float i_beta,float i_d,float i_q, float dt) {
+   
+	// 电机若是内置式（Ld≠Lq），必须根据电流实时调整电感
+		float L_dynamic = MOTOR_LS;
+//		if (fabsf(i_d) > 0.1f || fabsf(i_q) > 0.1f) {
+//				float ld_lq_diff = MOTOR_LQ - MOTOR_LD;
+//				L_dynamic = MOTOR_LS - ld_lq_diff/2.0f 
+//									+ ld_lq_diff * (i_q * i_q) / (i_d * i_d + i_q * i_q);
+//		}
+		// 1. 计算电感压降项
+    float L_ia = L_dynamic * i_alpha;
+    float L_ib = L_dynamic * i_beta;
     
     // 2. 计算磁链误差
     float lambda_sq = MOTOR_FLUX_LINKAGE * MOTOR_FLUX_LINKAGE;
     float x1_ia = obs->obs_x1 - L_ia;
     float x2_ib = obs->obs_x2 - L_ib;
     float err = lambda_sq - (x1_ia * x1_ia + x2_ib * x2_ib);
-    
+    //  单向离合器 保证收敛
+    if (err > 0.0f) {
+        err = 0.0f;
+    }
     // 3. 状态变量积分 (加入修正项)
-    float gain = OBSERVER_GAIN;
-    obs->obs_x1 += (v_alpha - MOTOR_RS * i_alpha + gain * err * x1_ia) * dt;
-    obs->obs_x2 += (v_beta  - MOTOR_RS * i_beta  + gain * err * x2_ib) * dt;
+		float gamma_adaptive = OBSERVER_GAIN;
+		float speed_abs = fabsf(obs->omega_est);
+		if (speed_abs < 200.0f) { 					// 低速区
+				gamma_adaptive *= 0.5f; 				// 降低增益，压制噪声
+		} else if (speed_abs > 1000.0f) { 	// 高速区
+				gamma_adaptive *= 1.2f; 				// 提高增益，保证带宽
+		}
+    obs->obs_x1 += (v_alpha - MOTOR_RS * i_alpha + gamma_adaptive * err * x1_ia) * dt;
+    obs->obs_x2 += (v_beta  - MOTOR_RS * i_beta  + gamma_adaptive * err * x2_ib) * dt;
     
     // 4. 提取转子磁链
     float flux_alpha = obs->obs_x1 - L_ia;
@@ -71,7 +88,7 @@ void Ctrl_Observer_Update(Ctrl_Observer_t *obs, float v_alpha, float v_beta, flo
 }
 
 /* ============================================================
- * 强拖切入闭环瞬间的强行对齐 (VESC 无缝启动核心)
+ * 强拖切入闭环瞬间的强行对齐 (无缝启动核心)
  * ============================================================ */
 void Ctrl_Observer_ForceAlign(Ctrl_Observer_t *obs, float theta_if, float freq_e, float i_alpha, float i_beta) {
     float sin_e, cos_e;

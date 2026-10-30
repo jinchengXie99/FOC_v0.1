@@ -43,7 +43,7 @@ void APP_Telemetry_Send(Motor_Ctrl_t *motor) {
         // 3. 启动 DMA 发送
         HAL_UART_Transmit_DMA(&huart1, (uint8_t *)&tx_frame, sizeof(VOFA_Frame_t));
     } else {
-        // 商用防死锁：如果连续 5ms 没发完，强制干掉 DMA
+        // 防死锁：如果连续 5ms 没发完，强制干掉 DMA
         if (++tx_timeout_cnt > 5) {
             HAL_UART_AbortTransmit(&huart1);
             tx_busy = 0;

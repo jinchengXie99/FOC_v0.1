@@ -56,11 +56,11 @@
  * 硬件保护与限幅阈值 
  * ============================================================ */
 #define DRV_OC_HARD_LIMIT       25.0f           /* 硬件级过流阈值 (A) - 立即关断 */
-#define DRV_OC_SOFT_LIMIT       15.0f           /* 软件级过流阈值 (A) - 连续触发关断 */
+#define DRV_OC_SOFT_LIMIT       20.0f           /* 软件级过流阈值 (A) - 连续触发关断 */
 #define DRV_OC_DEBOUNCE_CNT     5               /* 软过流消抖次数 (20kHz下 = 250us) */
 
-#define DRV_OVP_THRESHOLD       30.0f           /* 过压保护阈值 (V) (TVS 40V动作，留余量) */
-#define DRV_OVP_RECOVER         29.0f           /* 过压恢复阈值 (V) */
+#define DRV_OVP_THRESHOLD       40.0f           /* 过压保护阈值 (V) (TVS 40V动作，留余量) */
+#define DRV_OVP_RECOVER         35.0f           /* 过压恢复阈值 (V) */
 #define DRV_UVP_THRESHOLD       10.0f           /* 欠压保护阈值 (V) */
 #define DRV_UVP_RECOVER         12.0f           /* 欠压恢复阈值 (V) */
 

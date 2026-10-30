@@ -21,7 +21,7 @@ typedef enum {
 typedef struct {
     volatile MotorState_t state;
     Ctrl_Observer_t obs;    // 观测器句柄
-    Speed_PI_t   pi_speed;     // 速度环
+    Speed_PI_t   pi_speed;   // 速度环
     Current_PI_t pi_id;      // D轴电流环
     Current_PI_t pi_iq;      // Q轴电流环
 

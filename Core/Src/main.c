@@ -198,7 +198,7 @@ void SystemClock_Config(void)
 
 /* ============================================================
  * 中断回调路由中心
- * 严格按照"大厂规范"：中断里只做路由，具体逻辑下沉到各模块
+ * 按照"规范"：中断里只做路由，具体逻辑下沉到各模块
  * ============================================================ */
 
 /**
@@ -235,9 +235,9 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
     g_motor.i_alpha = g_motor.i_a;
     g_motor.i_beta  = (g_motor.i_a + 2.0f * g_motor.i_b) * 0.57735027f;
 
-    // 4. VESC 观测器更新 (计算角度与速度)
+    // 4. 磁链观测器更新 (计算角度与速度)
     Ctrl_Observer_Update(&g_motor.obs, g_motor.v_alpha, g_motor.v_beta,
-                         g_motor.i_alpha, g_motor.i_beta, FOC_DT);
+                         g_motor.i_alpha, g_motor.i_beta, g_motor.i_d,g_motor.i_q, FOC_DT);
 
     // 5. IF 角度与频率必须按电流环周期更新。
     if (g_motor.state == STATE_IF) {
@@ -311,15 +311,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
         // 4. 速度环与高级算法 (仅在闭环运行下生效)
         if (g_motor.state == STATE_RUN) {
+					
             if (g_motor.run_timer <= 20U) {
                 g_motor.pi_speed.integral = IF_START_IQ;
                 g_motor.iq_ref = IF_START_IQ;
             } else {
 							
-                
 								// 使用 0.05f 的滤波系数，截止频率约 8Hz，能有效滤除高频毛刺
 								g_motor.obs.speed_rpm_filt = g_motor.obs.speed_rpm_filt * 0.99f + g_motor.obs.speed_rpm * 0.01f;
-							float speed_actual = g_motor.obs.speed_rpm_filt;
+							  float speed_actual = g_motor.obs.speed_rpm_filt;
                 float speed_error = g_motor.target_rpm - speed_actual;
                 if (isnan(speed_actual) || isinf(speed_actual) ||
                     isnan(speed_error) || isinf(speed_error)) {
