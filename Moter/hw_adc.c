@@ -2,9 +2,7 @@
 #include "drv_config.h"
 #include "stm32g4xx.h"
 
-/* ============================================================
- * 内部私有变量 (用于偏置自动校准)
- * ============================================================ */
+/* 注入组零电流偏置校准样本数；20 kHz 下累计约 100 ms。 */
 #define CALIB_SAMPLES 2000  /* 采集 2000 次求平均 (20kHz下耗时 100ms) */
 
 volatile uint16_t adc_regular_dma_buf[ADC_REGULAR_BUF_SIZE] = {0U, 0U};
@@ -18,10 +16,13 @@ static uint16_t calib_cnt = 0;
 static float ia_offset = 2048.0f;
 static float ic_offset = 2048.0f;
 
-/* ============================================================
- * 偏置自动校准状态机
- * 必须在 20kHz 的 ADC 中断最前端调用
- * ============================================================ */
+/**
+ * @brief 累计注入组原始电流 ADC 样本并估算零电流偏置。
+ *
+ * 校准完成标志置位后后续调用不再更新偏置。调用期间电机必须静止、
+ * PWM 不得输出，否则偏置中将混入实际相电流。
+ * @return 校准完成返回 1，尚未完成返回 0
+ */
 uint8_t HW_ADC_CalibrateInjected(uint16_t raw_ia, uint16_t raw_ic) {
     if (g_calib_done) {
         return 1; 
@@ -32,7 +33,7 @@ uint8_t HW_ADC_CalibrateInjected(uint16_t raw_ia, uint16_t raw_ic) {
     calib_cnt++;
 
     if (calib_cnt >= CALIB_SAMPLES) {
-        // 计算平均值并保存
+        /* 对两个采样通道分别取样本平均值，作为后续电流换算零点。 */
         ia_offset = (float)sum_ia / (float)CALIB_SAMPLES;
         ic_offset = (float)sum_ic / (float)CALIB_SAMPLES;
         g_calib_done = 1U;
@@ -40,34 +41,32 @@ uint8_t HW_ADC_CalibrateInjected(uint16_t raw_ia, uint16_t raw_ic) {
     return 0;
 }
 
-/* ============================================================
- * 极速读取三相电流
- * 跳过 HAL 库的 HAL_ADCEx_InjectedGetValue() 函数，
- * 直接读寄存器 ADC2->JDRx，省去函数跳转开销。
- * ============================================================ */
+/**
+ * @brief 读取 ADC2 注入组电流样本并换算为三相电流 (A)。
+ *
+ * Rank1/JDR1 对应 IA，Rank2/JDR2 对应 IC；IB 根据三相电流和为零
+ * 的关系推算。寄存器映射必须与 CubeMX ADC 注入组配置一致。
+ */
 void HW_ADC_GetCurrents(volatile float *ia, volatile float *ib, volatile float *ic) {
-    // 1. 直接读取注入数据寄存器 (对应 CubeMX 中 Rank1 和 Rank2)
-    // PA6 -> ADC2_IN3 -> Rank1 -> JDR1
-    // PA4 -> ADC2_IN17 -> Rank2 -> JDR2
+    /* 直接读取注入数据寄存器；PA6/ADC2_IN3 为 Rank1，PA4/ADC2_IN17 为 Rank2。 */
     uint16_t raw_ia = (uint16_t)(ADC2->JDR1 & 0xFFFF);
     uint16_t raw_ic = (uint16_t)(ADC2->JDR2 & 0xFFFF);
 
-    // 2. 减去偏置电压并乘以换算系数 (CURRENT_SCALE 在 drv_config.h 中已定义)
+    /* 减去自动校准零点，再按 drv_config.h 中的 A/LSB 系数换算。 */
     *ia = ((float)raw_ia - ia_offset) * DRV_CURRENT_SCALE;
     *ic = ((float)raw_ic - ic_offset) * DRV_CURRENT_SCALE;
     
-    // 3. 基尔霍夫电流定律算 B 相
+    /* 两相采样方案：按 ia + ib + ic = 0 推算未采样的 B 相电流。 */
     *ib = -(*ia) - (*ic);
 }
 
-/* ============================================================
- * 读取母线电压与调速器电压 (直接读 DMA 内存)
- * ============================================================ */
+/** @brief 读取规则组 DMA 缓冲区通道 0，并换算母线电压 (V)。 */
 float HW_ADC_GetVbus(void) {
-    // 读内存速度极快，无需任何等待
+    /* DMA 必须已配置为通道 0 采集母线分压。 */
     return (float)adc_regular_dma_buf[0] * DRV_VBUS_SCALE;
 }
 
+/** @brief 读取规则组 DMA 缓冲区通道 1，并换算调速器输入电压 (V)。 */
 float HW_ADC_GetThrottleVoltage(void) {
     return (float)adc_regular_dma_buf[1] * DRV_THROTTLE_SCALE;
 }

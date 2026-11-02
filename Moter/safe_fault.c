@@ -7,7 +7,12 @@
 
 static volatile uint8_t soft_overcurrent_count;
 
+/**
+ * @brief 在高速采样路径检查三相电流，并立即处理过流故障。
+ * @return 无故障返回 FAULT_NONE，否则返回硬件级或软件级过流码
+ */
 uint8_t SAFE_CheckCurrentFast(float ia, float ib, float ic) {
+    /* 过流阈值作用于三相中绝对值最大的相电流。 */
     float i_max = fabsf(ia);
     uint8_t fault = FAULT_NONE;
 
@@ -35,9 +40,19 @@ uint8_t SAFE_CheckCurrentFast(float ia, float ib, float ic) {
     return fault;
 }
 
-/* 母线电压保护由 1kHz 调度调用；过流另在 ADC 高频路径检测。 */
+/**
+ * @brief 执行低频安全检查。
+ * @param vbus 母线电压 (V)
+ * @param ia A 相电流反馈 (A)
+ * @param ib B 相电流反馈 (A)
+ * @param ic C 相电流反馈 (A)
+ * @return 检出的故障码；返回 FAULT_NONE 表示未触发阈值
+ *
+ * 此路径检查硬过流、带消抖的母线过压/欠压；软过流消抖在 ADC
+ * 高频路径处理，以缩短保护响应时间。
+ */
 uint8_t SAFE_Check(float vbus, float ia, float ib, float ic) {
-    // 1. 电流硬限值检查 (1kHz 备用路径)
+    /* 低频路径再次检查硬过流，作为高速检测之外的保护冗余。 */
     float i_max = fabsf(ia);
     if (fabsf(ib) > i_max) i_max = fabsf(ib);
     if (fabsf(ic) > i_max) i_max = fabsf(ic);
@@ -46,7 +61,7 @@ uint8_t SAFE_Check(float vbus, float ia, float ib, float ic) {
         return FAULT_OC_HARD; // 硬阈值过流，25A
     }
 
-    /* 2. 过压保护 (必须加 3 次消抖，过滤加速瞬间的毛刺) */
+    /* 母线过压需连续三个低频样本超过阈值才触发，降低瞬态毛刺误报。 */
     static uint8_t ovp_debounce = 0;
 
     if (vbus > DRV_OVP_THRESHOLD) {
@@ -55,7 +70,7 @@ uint8_t SAFE_Check(float vbus, float ia, float ib, float ic) {
         ovp_debounce = 0;
     }
 
-    /* 3. 欠压保护 (运行状态下才检测，加 5 次消抖) */
+    /* 仅非 IDLE 状态检测欠压；连续五个低频样本低于门限后触发。 */
     static uint8_t uvp_debounce = 0;
     if (g_motor.state != STATE_IDLE && vbus < DRV_UVP_THRESHOLD) {
      
@@ -67,19 +82,22 @@ uint8_t SAFE_Check(float vbus, float ia, float ib, float ic) {
     return FAULT_NONE; // 正常
 }
 
-/* ============================================================
- * 故障锁存处理 (在主循环中轮询恢复)
- * ============================================================ */
+/**
+ * @brief 主循环中的故障锁存与人工复位处理。
+ *
+ * 处于 FAULT 时持续关闭功率级并更新指示灯；仅在按键按下、目标
+ * 转速近零、母线处于恢复区间且三相电流近零时清除故障并复位控制器。
+ */
 void SAFE_HandleFault(void) {
     if (g_motor.state == STATE_FAULT) {
-        // 强制关断 SD 引脚
+        /* 故障期间每次轮询都确保驱动使能保持关闭。 */
         HW_PWM_Disable();
         
-        // 亮红灯
+        /* 红灯亮、绿灯灭表示故障锁存。 */
         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET); // 红亮
         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);   // 绿灭
 
-        // 只有当电流归零，且按下复位键时，才解除锁存
+        /* 人工复位需同时满足安全电流、转速及母线电压条件。 */
         uint8_t key_pressed = (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9) == GPIO_PIN_RESET);
         float vbus = HW_ADC_GetVbus();
         if (key_pressed &&
@@ -89,7 +107,7 @@ void SAFE_HandleFault(void) {
             fabsf(g_motor.i_a) < 0.5f &&
             fabsf(g_motor.i_b) < 0.5f &&
             fabsf(g_motor.i_c) < 0.5f) {
-            // 复位状态
+            /* 清除故障状态、重置观测器和 PI，并将输出参考归零。 */
             g_motor.fault_code = 0;
             g_motor.state = STATE_IDLE;
             Ctrl_Observer_Init(&g_motor.obs);

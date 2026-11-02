@@ -5,21 +5,21 @@
  * 硬件版本与系统时钟配置
  * ============================================================ */
 #define DRV_HW_VERSION          "HS_V2.0"       /* 浩盛单路电机开发板 V2.0 */
-#define DRV_MCU_CLOCK           170000000UL     /* 系统主频 170MHz */
+#define DRV_MCU_CLOCK           170000000UL     /* 系统主频 (Hz)，应与 SystemClock_Config 一致。 */
 
 /* ============================================================
  * PWM 驱动配置 (TIM1 - 20kHz 中心对齐)
  * ============================================================ */
 #define DRV_PWM_FREQ_HZ         20000.0f        /* PWM 控制频率 20kHz */
-#define DRV_PWM_ARR             4249            /* 自动重装载值 (170M / (2 * 20k) = 4250) */
-#define DRV_PWM_DEADTIME_NS     0               /* TIM1 内部死区补偿，由于 EG2104 自带硬件死区，这里为 0 */
+#define DRV_PWM_ARR             4249            /* 中心对齐计数 ARR：170 MHz/(2*20 kHz)=4250 个计数，ARR=4249。 */
+#define DRV_PWM_DEADTIME_NS     0               /* TIM1 死区设置 (ns)；外部 EG2104 已提供硬件死区。 */
 
 /* ============================================================
  * ADC 电流采样配置 (注入组 - 双电阻采样)
  * 硬件：EG2104 下桥 + 5mΩ 采样电阻 + COS722MR 运放(10倍) + 1.65V 偏置
  * ============================================================ */
-#define DRV_ADC_VREF            3.3f            /* ADC 参考电压 */
-#define DRV_ADC_RESOLUTION      4096.0f         /* 12位 ADC 分辨率 */
+#define DRV_ADC_VREF            3.3f            /* ADC 参考电压 (V)。 */
+#define DRV_ADC_RESOLUTION      4096.0f         /* 12 位 ADC 的量化级数 (2^12)。 */
 
 #define DRV_SHUNT_RESISTOR      0.005f          /* 采样电阻 5mΩ (R28, R29) */
 #define DRV_OPAMP_GAIN          10.0f           /* COS722MR 运放增益 10倍 */
@@ -57,12 +57,12 @@
  * ============================================================ */
 #define DRV_OC_HARD_LIMIT       25.0f           /* 硬件级过流阈值 (A) - 立即关断 */
 #define DRV_OC_SOFT_LIMIT       20.0f           /* 软件级过流阈值 (A) - 连续触发关断 */
-#define DRV_OC_DEBOUNCE_CNT     5               /* 软过流消抖次数 (20kHz下 = 250us) */
+#define DRV_OC_DEBOUNCE_CNT     5               /* 软过流连续触发次数；20 kHz 下约 250 us。 */
 
 #define DRV_OVP_THRESHOLD       40.0f           /* 过压保护阈值 (V) (TVS 40V动作，留余量) */
-#define DRV_OVP_RECOVER         35.0f           /* 过压恢复阈值 (V) */
+#define DRV_OVP_RECOVER         35.0f           /* 允许人工复位的母线电压上限 (V)，低于过压触发值。 */
 #define DRV_UVP_THRESHOLD       10.0f           /* 欠压保护阈值 (V) */
-#define DRV_UVP_RECOVER         12.0f           /* 欠压恢复阈值 (V) */
+#define DRV_UVP_RECOVER         12.0f           /* 允许启动/人工复位的母线电压下限 (V)，高于欠压触发值。 */
 
 /* ============================================================
  * 引脚与控制宏定义 (与 CubeMX Pinout 严格对应)

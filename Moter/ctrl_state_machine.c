@@ -3,11 +3,18 @@
 #include "mtr_config.h"
 #include "safe_fault.h"
 #include <math.h>
-/* 静态变量，记录上一次的状态，用于检测状态跳变 */
+/* 上一调度周期的状态，用于只在进入新状态时执行一次初始化动作。 */
 static MotorState_t last_state = STATE_IDLE;
-/* ============================================================
- * 1kHz 状态机调度与处理
- * ============================================================ */
+/**
+ * @brief 以低频任务节拍执行电机状态机。
+ *
+ * 负责各状态的进入动作、PWM 使能管理、制动电流参考和超时处理。
+ * IF 电角度/频率等高速变量由 ADC 电流环更新，不在此任务推进。
+ *
+ * @param motor 电机控制状态
+ * @param vbus 母线电压 (V)，当前状态机实现未直接使用
+ * @param dt 状态机任务周期 (s)，当前计时使用调用次数而非 dt
+ */
 void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt) {
     MotorState_t current_state = motor->state;
     (void)vbus;
@@ -15,6 +22,7 @@ void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt) {
 
     switch (current_state) {
         case STATE_IDLE:
+            /* 停机状态始终关闭 PWM；离开运行态后清理控制器及 IF 状态。 */
             HW_PWM_Disable();
             if (last_state != STATE_IDLE) {
                 Speed_PI_Reset(&motor->pi_speed);
@@ -30,7 +38,7 @@ void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt) {
             break;
 
         case STATE_IF:
-            // IF angle and frequency are advanced only by the ADC-rate loop.
+            /* IF 角度和频率由 ADC 频率的高速控制路径推进。 */
             if (last_state != STATE_IF) {
                 motor->theta_if = 0.0f;
                 motor->freq_e = 0.0f;
@@ -49,6 +57,7 @@ void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt) {
             break;
 
         case STATE_RUN:
+            /* 闭环运行期间累计毫秒级计数，供上层启动/运行逻辑使用。 */
             if (last_state != STATE_RUN) {
                 HW_PWM_Enable();
                 motor->run_timer = 0;
@@ -59,6 +68,7 @@ void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt) {
             break;
 
         case STATE_BRAKE:
+            /* 反向 q 轴电流产生制动力矩；低速稳定后停车，超时则锁故障。 */
             if (last_state != STATE_BRAKE) {
                 HW_PWM_Enable();
                 Speed_PI_Reset(&motor->pi_speed);
@@ -87,6 +97,7 @@ void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt) {
             break;
 
         case STATE_FAULT:
+            /* 故障锁存期间关闭 PWM 并清零电流参考，等待外部故障恢复流程。 */
             HW_PWM_Disable();
             if (last_state != STATE_FAULT) {
                 Speed_PI_Reset(&motor->pi_speed);
@@ -102,6 +113,7 @@ void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt) {
 
         case STATE_ALIGN:
         default:
+            /* ALIGN 暂未实现，未知状态也按安全停机处理并回到 IDLE。 */
             HW_PWM_Disable();
             motor->iq_ref = 0.0f;
             motor->state = STATE_IDLE;

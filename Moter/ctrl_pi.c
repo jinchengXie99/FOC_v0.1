@@ -1,9 +1,12 @@
 #include "ctrl_pi.h"
 #include <stddef.h>
 
-/* ============================================================
- * 速度环 PI 实现
- * ============================================================ */
+/**
+ * @brief 初始化速度 PI。
+ * @param kp 比例系数，按 A/RPM 标定
+ * @param ki 积分系数，按 A/(RPM*s) 标定
+ * @param out_max, out_min 输出电流上下限 (A)
+ */
 void Speed_PI_Init(Speed_PI_t *pi, float kp, float ki, float out_max, float out_min) {
     if (pi == NULL) return;
     pi->kp = kp;
@@ -11,7 +14,7 @@ void Speed_PI_Init(Speed_PI_t *pi, float kp, float ki, float out_max, float out_
     pi->integral = 0.0f;
     pi->out_max = out_max;
     pi->out_min = out_min;
-    pi->i_max = out_max;  // 积分限幅通常与输出限幅一致
+    /* 默认积分限幅与输出限幅一致，限制积分状态的幅值。 */
     pi->i_min = out_min;
 }
 
@@ -43,9 +46,7 @@ float Speed_PI_Calc(Speed_PI_t *pi, float target, float actual, float dt) {
     return out;
 }
 
-/* ============================================================
- * 电流环 PI 实现
- * ============================================================ */
+/** @brief 初始化电流 PI；输出上下限对称，单位为 V。 */
 void Current_PI_Init(Current_PI_t *pi, float kp, float ki, float out_max) {
     if (pi == NULL) return;
     pi->kp = kp;
@@ -61,6 +62,7 @@ void Current_PI_Reset(Current_PI_t *pi) {
 }
 
 float Current_PI_Calc(Current_PI_t *pi, float target, float actual, float dt) {
+    /* 电流误差 (A) 经 PI 转换为电压指令 (V)。 */
     float error = target - actual;
     
     float p_out = pi->kp * error;
