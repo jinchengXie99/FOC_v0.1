@@ -39,10 +39,11 @@
 #define PLL_KP                  50.0f       /* PLL 比例 */
 #define PLL_KI                  6000.0f     /* PLL 积分 */
 
-#define IF_START_FREQ           10.0f       /* 强拖切入频率 (Hz) */
+#define IF_START_FREQ           0.0f       /* 强拖切入频率 (Hz) */
 #define IF_RAMP_RATE            20.0f       /* 强拖频率爬坡 (Hz/s) */
 #define IF_START_IQ             0.5f        /* 强拖启动电流 (A) */
 #define BRAKE_CURRENT           0.5f        /* 制动电流 (A) */
+#define BRAKE_TIMEOUT_MS        3000U       /* 制动超时后关断并锁定故障 */
 
 #define FW_VOLTAGE_THRESHOLD    0.93f       /* 弱磁触发电压利用率 */
 #define FW_MAX_CURRENT          3.0f        /* 最大弱磁电流 */

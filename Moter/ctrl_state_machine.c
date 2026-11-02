@@ -1,6 +1,7 @@
 #include "ctrl_state_machine.h"
 #include "hw_pwm.h"
 #include "mtr_config.h"
+#include "safe_fault.h"
 #include <math.h>
 /* 静态变量，记录上一次的状态，用于检测状态跳变 */
 static MotorState_t last_state = STATE_IDLE;
@@ -33,7 +34,8 @@ void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt) {
             if (last_state != STATE_IF) {
                 motor->theta_if = 0.0f;
                 motor->freq_e = 0.0f;
-                motor->iq_ref = IF_START_IQ;
+                motor->direction = motor->direction < 0 ? -1 : 1;
+                motor->iq_ref = (float)motor->direction * IF_START_IQ;
                 motor->id_mtpa_ref = 0.0f;
                 motor->id_fw_ref = 0.0f;
                 motor->run_timer = 0U;
@@ -64,18 +66,23 @@ void Ctrl_StateMachine_Task(Motor_Ctrl_t *motor, float vbus, float dt) {
                 Current_PI_Reset(&motor->pi_iq);
                 motor->run_timer = 0U;
             }
-            if (motor->run_timer < 1000U) {
+            if (motor->run_timer < BRAKE_TIMEOUT_MS) {
                 motor->run_timer++;
             }
-            motor->iq_ref = motor->obs.speed_rpm > 0.0f ? -fabsf(BRAKE_CURRENT) :
-                            (motor->obs.speed_rpm < 0.0f ? fabsf(BRAKE_CURRENT) : 0.0f);
+            if (fabsf(motor->obs.speed_rpm) > 20.0f) {
+                motor->direction = motor->obs.speed_rpm > 0.0f ? 1 : -1;
+            }
+            motor->iq_ref = -(float)motor->direction * fabsf(BRAKE_CURRENT);
             motor->id_mtpa_ref = 0.0f;
 
-            if ((fabsf(motor->obs.speed_rpm) < 20.0f && motor->run_timer > 100U) ||
-                motor->run_timer >= 1000U) {
+            if (fabsf(motor->obs.speed_rpm) < 20.0f && motor->run_timer > 100U) {
                 HW_PWM_Disable();
                 motor->iq_ref = 0.0f;
                 motor->state = STATE_IDLE;
+            } else if (motor->run_timer >= BRAKE_TIMEOUT_MS) {
+                HW_PWM_Disable();
+                motor->fault_code = FAULT_BRAKE_TIMEOUT;
+                motor->state = STATE_FAULT;
             }
             break;
 

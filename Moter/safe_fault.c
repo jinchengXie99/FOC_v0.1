@@ -83,7 +83,7 @@ void SAFE_HandleFault(void) {
         uint8_t key_pressed = (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9) == GPIO_PIN_RESET);
         float vbus = HW_ADC_GetVbus();
         if (key_pressed &&
-            g_motor.target_rpm <= 0.0f &&
+            fabsf(g_motor.target_rpm) < 10.0f &&
             vbus > DRV_UVP_RECOVER &&
             vbus < DRV_OVP_RECOVER &&
             fabsf(g_motor.i_a) < 0.5f &&

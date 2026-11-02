@@ -9,6 +9,7 @@
 #define FAULT_OVP 		2
 #define FAULT_UVP 		3
 #define FAULT_OC_SOFT   4
+#define FAULT_BRAKE_TIMEOUT 5
 
 uint8_t SAFE_Check(float vbus, float ia, float ib, float ic);
 uint8_t SAFE_CheckCurrentFast(float ia, float ib, float ic);

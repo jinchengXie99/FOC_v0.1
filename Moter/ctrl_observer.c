@@ -100,6 +100,9 @@ void Ctrl_Observer_ForceAlign(Ctrl_Observer_t *obs, float theta_if, float freq_e
 
     // 强行将 PLL 积分器设为当前速度
     obs->pll_integral = 6.28318531f * freq_e;
+    obs->omega_est = obs->pll_integral;
+    obs->speed_rpm = freq_e * 60.0f / MOTOR_POLE_PAIRS;
+    obs->speed_rpm_filt = obs->speed_rpm;
 
     // 强行覆盖角度
     obs->theta_est = theta_if;

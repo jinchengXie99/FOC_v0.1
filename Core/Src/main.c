@@ -241,19 +241,23 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 
     // 5. IF 角度与频率必须按电流环周期更新。
     if (g_motor.state == STATE_IF) {
-        if (g_motor.freq_e < IF_START_FREQ) {
+        float target_freq = (float)g_motor.direction * IF_START_FREQ;
+        if (g_motor.direction > 0 && g_motor.freq_e < target_freq) {
             g_motor.freq_e += IF_RAMP_RATE * FOC_DT;
-            if (g_motor.freq_e > IF_START_FREQ) {
-                g_motor.freq_e = IF_START_FREQ;
-            }
+            if (g_motor.freq_e > target_freq) g_motor.freq_e = target_freq;
+        } else if (g_motor.direction < 0 && g_motor.freq_e > target_freq) {
+            g_motor.freq_e -= IF_RAMP_RATE * FOC_DT;
+            if (g_motor.freq_e < target_freq) g_motor.freq_e = target_freq;
         }
         g_motor.theta_if += 6.28318531f * g_motor.freq_e * FOC_DT;
         if (g_motor.theta_if >= 6.28318531f) {
             g_motor.theta_if -= 6.28318531f;
+        } else if (g_motor.theta_if < 0.0f) {
+            g_motor.theta_if += 6.28318531f;
         }
         g_motor.obs.theta_est = g_motor.theta_if;
 
-        if (g_motor.freq_e >= IF_START_FREQ) {
+        if (fabsf(g_motor.freq_e) >= IF_START_FREQ) {
             Ctrl_Observer_ForceAlign(&g_motor.obs, g_motor.theta_if,
                                      g_motor.freq_e, g_motor.i_alpha,
                                      g_motor.i_beta);
@@ -295,14 +299,30 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         APP_Throttle_Update(throttle_v, &target_rpm);
         g_motor.target_rpm = target_rpm;
 
-        // 油门归零时安全停机；空闲时只在母线正常且油门有效时启动。
+        // 中位指令触发受控停车；反向指令必须等转速降到近零后再启动。
         if (g_motor.state != STATE_FAULT) {
-            if (g_motor.target_rpm <= 0.0f) {
-                g_motor.state = STATE_IDLE;
+            int8_t target_direction = target_rpm > 0.0f ? 1 : -1;
+            float speed_abs = fabsf(g_motor.obs.speed_rpm);
+
+            if (target_rpm == 0.0f) {
+                if (g_motor.state == STATE_IF || g_motor.state == STATE_RUN) {
+                    g_motor.state = STATE_BRAKE;
+                }
             } else if (g_motor.state == STATE_IDLE &&
                        vbus > DRV_UVP_RECOVER &&
                        vbus < DRV_OVP_RECOVER) {
-                g_motor.state = STATE_IF;
+                if (speed_abs > 20.0f) {
+                    g_motor.state = STATE_BRAKE;
+                } else {
+                    g_motor.direction = target_direction;
+                    g_motor.state = STATE_IF;
+                }
+            } else if (g_motor.state == STATE_IF &&
+                       target_direction != g_motor.direction) {
+                g_motor.state = STATE_BRAKE;
+            } else if (g_motor.state == STATE_RUN &&
+                       target_direction != (g_motor.obs.speed_rpm >= 0.0f ? 1 : -1)) {
+                g_motor.state = speed_abs <= 20.0f ? STATE_IDLE : STATE_BRAKE;
             }
         }
 
@@ -313,8 +333,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         if (g_motor.state == STATE_RUN) {
 					
             if (g_motor.run_timer <= 20U) {
-                g_motor.pi_speed.integral = IF_START_IQ;
-                g_motor.iq_ref = IF_START_IQ;
+                g_motor.pi_speed.integral = (float)g_motor.direction * IF_START_IQ;
+                g_motor.iq_ref = (float)g_motor.direction * IF_START_IQ;
             } else {
 							
 								// 使用 0.05f 的滤波系数，截止频率约 8Hz，能有效滤除高频毛刺

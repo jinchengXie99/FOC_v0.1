@@ -41,6 +41,7 @@ typedef struct {
     // IF 启动状态
     volatile float theta_if;
     volatile float freq_e;
+    volatile int8_t direction;
     volatile uint16_t run_timer;
 
     // 故障标志
